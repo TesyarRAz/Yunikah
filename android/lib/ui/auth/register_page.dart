@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:yunikah/model/user.dart';
 import 'package:yunikah/ui/auth/login_page.dart';
 
 class RegisterPage extends StatefulWidget {
@@ -170,8 +169,6 @@ class _RegisterPageState extends State<RegisterPage> {
       
       Future.delayed(Duration(seconds: 3), () {
         Navigator.of(context).pop();
-
-        users.add(User(_username.text, _password.text, name: _nama.text));
 
         showDialog(
           context: context,

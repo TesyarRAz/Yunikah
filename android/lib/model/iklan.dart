@@ -1,11 +1,25 @@
-import 'package:flutter/material.dart';
+import 'package:yunikah/model/asset.dart';
 
 class Iklan {
   int id;
-  String asset;
+  String name;
+  String keterangan;
 
-  ImageProvider get image => AssetImage('assets/images/$asset');
+  Asset image;
 
-  Iklan({this.id, this.asset});
+  Iklan({
+    this.id,
+    this.name,
+    this.image,
+    this.keterangan
+  });
 
+  factory Iklan.parseFromJson(Map<String, dynamic> data) => Iklan(
+    id: data['id'],
+    name: data['name'],
+    image: Asset.parseFromJson(data['image']),
+    keterangan: data['keterangan']
+  );
 }
+
+List<Iklan> iklanFromJson(List<dynamic> data) => data.map((e) => Iklan.parseFromJson(e)).toList();

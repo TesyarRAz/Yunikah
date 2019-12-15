@@ -50,6 +50,7 @@ class _SplashPageState extends State<SplashPage> with SingleTickerProviderStateM
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
             CircleAvatar(
+              radius: 25,
               backgroundColor: Colors.white,
               child: Icon(Icons.card_giftcard, size: 32,),
             ),

@@ -1,14 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:yunikah/model/user.dart';
 import 'package:yunikah/ui/akun/akun_page.dart';
+import 'package:yunikah/ui/home/belanja_page.dart';
 import 'package:yunikah/ui/home/home_page.dart';
 
 class MenuPage extends StatefulWidget {
   static const TAG = "menu";
 
-  final User _authUser;
+  final User authUser;
 
-  MenuPage(this._authUser);
+  MenuPage(this.authUser);
 
   @override
   _MenuPageState createState() => _MenuPageState();
@@ -19,12 +20,16 @@ class _MenuPageState extends State<MenuPage> {
 
   List<_HomeTabItem> _tabList;
 
+  var _scaffoldKey = GlobalKey<ScaffoldState>();
+
   @override
   void initState() {
     super.initState();
 
     _tabList = [
       _HomeTabItem(text: 'Home', icon: Icons.home, builder: (user) => HomePage(user)),
+      _HomeTabItem(text: 'Belanja', icon: Icons.add_shopping_cart, builder: (user) => BelanjaPage()),
+      _HomeTabItem(text: 'Keranjang', icon: Icons.shopping_cart, builder: (user) => Text('Keranjang')),
       _HomeTabItem(text: 'Akun', icon: Icons.verified_user, builder: (user) => AkunPage(user)),
     ];
   }
@@ -32,6 +37,7 @@ class _MenuPageState extends State<MenuPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      key: _scaffoldKey,
       bottomNavigationBar: BottomNavigationBar(
         backgroundColor: Colors.white,
         type: BottomNavigationBarType.fixed,
@@ -49,34 +55,17 @@ class _MenuPageState extends State<MenuPage> {
         },
       ),
       body: Container(
-        child: _tabList[_currentTabIndex].builder(widget._authUser),
+        key: UniqueKey(),
+        child: _tabList[_currentTabIndex].builder(widget.authUser),
       ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-      floatingActionButton: FloatingActionButton(
-        child: Icon(Icons.shopping_cart, color: Colors.white,),
-        onPressed: () {
-          
-        },
-      ),
-      // floatingActionButton: Material(
-      //   color: Colors.orange,
-      //   child: IconButton(
-      //     icon: Icon(Icons.shopping_cart),
-      //     onPressed: () {
-
-      //     },
-      //   ),
-      // )
     );
   }
 }
 
-typedef _WidgetAuthCallback = Widget Function(User);
-
 class _HomeTabItem {
   String text;
   IconData icon;
-  _WidgetAuthCallback builder;
+  Widget Function(User) builder;
 
   _HomeTabItem({this.text, this.icon, this.builder});
 }

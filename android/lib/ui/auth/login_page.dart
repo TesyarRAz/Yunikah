@@ -7,7 +7,9 @@ import 'package:yunikah/ui/menu_page.dart';
 class LoginPage extends StatefulWidget {
   static const TAG = 'user.login';
 
-  LoginPage({ Key key }) : super(key: key);
+  final Function(User) callbackUser;
+
+  LoginPage({ this.callbackUser});
 
   @override
   _LoginPageState createState() => _LoginPageState();
@@ -15,6 +17,8 @@ class LoginPage extends StatefulWidget {
 
 class _LoginPageState extends State<LoginPage> {
   TextEditingController _usernameController, _passwordController;
+
+  var _scaffoldKey = GlobalKey<ScaffoldState>();
 
   @override
   void initState() {
@@ -27,16 +31,25 @@ class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      key: _scaffoldKey,
       backgroundColor: Colors.white,
       body: Center(
         child: Padding(
           padding: EdgeInsets.symmetric(horizontal: 20),
-          child: ScrollConfiguration(
-            behavior: ScrollBehavior(),
-            child: ListView(
-              shrinkWrap: true,
+          child: SingleChildScrollView(
+            child: Column(
               children: <Widget>[
-                Icon(Icons.supervised_user_circle, size: 100,),
+                Padding(
+                  padding: EdgeInsets.symmetric(vertical: 10),
+                  child: Text('Yunikah',
+                    style: TextStyle(
+                        color: Theme.of(context).primaryColor,
+                        fontSize: 32,
+                        fontFamily: 'Times New Roman'
+                    )
+                  ),
+                ),
+                Divider(),
                 Padding(
                   padding: EdgeInsets.symmetric(vertical: 10),
                   child: _buildUsername(),
@@ -64,8 +77,8 @@ class _LoginPageState extends State<LoginPage> {
                   ),
                 )
               ],
-            ),
-          )
+            )
+          ),
         )
       ),
     );
@@ -142,39 +155,39 @@ class _LoginPageState extends State<LoginPage> {
         }
       );
 
-      Future.delayed(Duration(seconds: 3), () {
-        Navigator.of(context).pop();
-        
-        ApiService().login(User(username, password)).then((user) {
-          if (user == null) {
-            showDialog(
-              context: context,
-              builder: (_) {
-                return Dialog(
-                  child: Padding(
-                    padding: EdgeInsets.all(20),
-                    child: Text('Username atau password salah!'),
-                  ),
-                  insetAnimationCurve: Curves.fastOutSlowIn,
-                  insetAnimationDuration: Duration(seconds: 2),
-                );
-              }
-            ).then((_) {
-              setState(() {
-                _usernameController.text = '';
-                _passwordController.text = '';
-              });
-            });
+      ApiService().login(username, password).then((user) {
+        if (user == null) {
+          showDialog(
+            context: context,
+            builder: (_) {
+              return Dialog(
+                child: Padding(
+                  padding: EdgeInsets.all(20),
+                  child: Text('Username atau password salah!'),
+                ),
+                insetAnimationCurve: Curves.fastOutSlowIn,
+                insetAnimationDuration: Duration(seconds: 2),
+              );
+            }
+          ).then((_) {
             
-            return;
-          }
+          });
+          
+          return;
+        }
 
-          Navigator.of(context).pushReplacement(
-            MaterialPageRoute(
-              builder: (_) => MenuPage(user)
-            )
-          );
-        });
+        widget.callbackUser(user);
+
+        Navigator.of(context).pushReplacement(
+          MaterialPageRoute(
+            builder: (_) => MenuPage(user)
+          )
+        );
+      }).then((_) {
+          setState(() {
+            _usernameController.text = '';
+            _passwordController.text = '';
+          });
       });
     }
 

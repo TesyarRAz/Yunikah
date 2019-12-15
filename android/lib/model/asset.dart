@@ -1,3 +1,4 @@
+import 'dart:convert';
 
 enum AssetType {
   image,
@@ -7,22 +8,19 @@ enum AssetType {
 class Asset {
   int id;
   String name;
-  String url;
-  String thumbnailUrl;
-  AssetType type;
+  String imageLink;
 
-  Asset({this.id, this.name, this.url, this.thumbnailUrl, this.type = AssetType.image});
+  Asset({
+    this.id,
+    this.name,
+    this.imageLink
+  });
 
-  factory Asset.parseFromJson(Map<String, dynamic> data) =>
-    Asset(
-      id: data['id'],
-      name: data['title'],
-      url: data['url'],
-      thumbnailUrl: data['thumbnailUrl']
-    );
-  
-  Map<String, dynamic> toJson() =>
-    { 'id' : id, 'title' : name, 'url' : url, 'thumbnailUrl' : thumbnailUrl, 'type' : type};
+  factory Asset.parseFromJson(Map<String, dynamic> data) => Asset(
+    id: data['id'],
+    name: data['name'],
+    imageLink: data['image_link']
+  );
 }
 
-List<Asset> assetsFromJson(List<Map<String, dynamic>> data) => data.map((e) => Asset.parseFromJson(e));
+List<Asset> assetsFromJson(List<String> data) => data.map((e) => Asset.parseFromJson(jsonDecode(e))).toList();

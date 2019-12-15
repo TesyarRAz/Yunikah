@@ -1,44 +1,50 @@
+import 'package:yunikah/model/asset.dart';
+
+class StatusKategori {
+  static const Rias = 'rias';
+  static const Photo = 'photo';
+  static const Gedung = 'gedung';
+  static const AlatPesta = 'alat';
+  static const Undangan = 'undangan';
+
+  int id;
+  String keterangan;
+
+  StatusKategori({
+    this.id,
+    this.keterangan,
+  });
+
+  factory StatusKategori.parseFromJson(Map<String, dynamic> data) => StatusKategori(
+    id: data['id'],
+    keterangan: data['keterangan'],
+  );
+}
+
 class Kategori {
   int id;
-  int userId;
   String name;
   int harga;
 
-  Kategori({this.id, this.userId, this.name, this.harga});
+  Asset image;
 
-  factory Kategori.parseFromJson(Map<String, dynamic> data) =>
-    Kategori(
-      id: data['id'],
-      userId: data['userId'],
-      name: data['title'],
-      );
+  StatusKategori statusKategori;
 
-  Map<String, dynamic> toJson() =>
-    { 'id' : id, 'userId' : userId, 'title' : name };
+  Kategori({
+    this.id,
+    this.name,
+    this.harga,
+    this.image,
+    this.statusKategori
+  });
+
+  factory Kategori.parseFromJson(Map<String, dynamic> data) => Kategori(
+    id: data['id'],
+    name: data['name'],
+    harga: data['harga'],
+    image: Asset.parseFromJson(data['image']),
+    // statusKategori: StatusKategori.parseFromJson(data['status'])
+  );
 }
 
-class Rias extends Kategori {
-  Rias({int id, int userId, String name, int harga}) :
-    super(id : id, userId : userId, name: name, harga: harga);
-
-  factory Rias.parseFromJson(Map<String, dynamic> data) =>
-    Rias(
-      id: data['id'],
-      userId: data['userId'],
-      name: data['title']
-      );
-}
-
-class Paket extends Kategori {
-  Paket({int id, int userId, String name, int harga}) : 
-    super(id : id, userId : userId, name: name, harga: harga);
-
-  factory Paket.parseFromJson(Map<String, dynamic> data) =>
-    Paket(
-      id: data['id'],
-      userId: data['userId'],
-      name: data['title']
-      );
-}
-
-List<Rias> riasesFromJson(List<Map<String, dynamic>> data) => data.map((e) => Rias.parseFromJson(e));
+List<Kategori> kategoriFromJson(List<dynamic> data) => data.map((e) => Kategori.parseFromJson(e)).toList();

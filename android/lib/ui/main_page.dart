@@ -3,13 +3,16 @@ import 'package:yunikah/ui/auth/register_page.dart';
 import 'package:yunikah/ui/auth/login_page.dart';
 import 'package:yunikah/ui/splash_page.dart';
 
-class MainPage extends StatefulWidget {
+var routes = <String, WidgetBuilder>{
+  LoginPage.TAG: (_) => LoginPage(
+    callbackUser: (user) {
+    
+    },
+  ),
+  RegisterPage.TAG: (_) => RegisterPage(),
+};
 
-  @override
-  _MainPageState createState() => _MainPageState();
-}
-
-class _MainPageState extends State<MainPage> {
+class MainPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -21,10 +24,7 @@ class _MainPageState extends State<MainPage> {
       ),
       themeMode: ThemeMode.dark,
       title: 'Yunikah',
-      routes: <String, WidgetBuilder>{
-        LoginPage.TAG: (_) => LoginPage(),
-        RegisterPage.TAG: (_) => RegisterPage(),
-      },
+      routes: routes,
       home: SplashPage(),
     );
   }

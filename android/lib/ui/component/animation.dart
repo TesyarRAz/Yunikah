@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 
 class LoadingView extends StatefulWidget {
-  double height;
+  final double height, width;
 
-  LoadingView({@required this.height});
+  LoadingView({this.height, this.width});
 
   @override
   State<StatefulWidget> createState() => _LoadingViewState();
@@ -14,7 +14,7 @@ class _LoadingViewState extends State<LoadingView> with SingleTickerProviderStat
   
   Animation<LinearGradient> _animation;
 
-  final _colors = [Colors.white, Colors.grey];
+  final _colors = [Colors.white, Colors.grey[300]];
 
   @override
   void initState() {
@@ -31,16 +31,22 @@ class _LoadingViewState extends State<LoadingView> with SingleTickerProviderStat
       end: LinearGradient(
         colors: _colors.reversed.toList()
       )
-    ).animate(_animationController);
+    ).animate(_animationController)
+    ..addStatusListener((status) {
+      if (status == AnimationStatus.dismissed)
+        _animationController.forward();
+      else if (status == AnimationStatus.completed)
+        _animationController.reverse();
+    });
 
     _animationController.forward();
   }
 
   @override
   void dispose() {
-    super.dispose();
-
     _animationController.dispose();
+
+    super.dispose();
   }
 
   @override
@@ -50,6 +56,7 @@ class _LoadingViewState extends State<LoadingView> with SingleTickerProviderStat
       builder: (_, child) {
         return SizedBox(
           height: widget.height,
+          width: widget.width,
           child: Container(
             decoration: BoxDecoration(
               gradient: _animation.value
