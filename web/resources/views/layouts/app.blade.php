@@ -53,38 +53,50 @@
                 <div class="collapse navbar-collapse" id="navbarSupportedContent">
                     <!-- Left Side Of Navbar -->
                     <ul class="navbar-nav mr-auto">
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ route('home') }}">Pemesanan</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ route('mitra.index') }}">Mitra</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ route('paket.index') }}">Paket</a>
-                        </li>
-                        <li class="nav-item dropdown">
-                            <a id="kategoriDropdown" class="nav-link dropdown-toggle" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>Kategori</a>
-                            <div class="dropdown-menu" aria-labelledby="kategoriDropdown">
-                                @foreach ($status_kategori as $kategori)
-                                    <a class="dropdown-item" href="{{
-                                        route('kategori.index', $kategori->keterangan)
-                                    }}">
-                                        @if ($kategori->keterangan == 'alat')
-                                            Alat Pesta
-                                        @else
-                                            {{ ucfirst($kategori->keterangan) }}
+                        @auth
+                            <li class="nav-item dropdown">
+                                <a id="pemesananDropdown" class="nav-link dropdown-toggle" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>Pemesanan</a>
+                                <div class="dropdown-menu" aria-labelledby="pemesananDropdown">
+                                    @php
+                                    $all_st_pemesanan = \App\Model\StatusPemesanan::all();
+                                    @endphp
+                                    @foreach ($all_st_pemesanan as $st)
+                                        @if ($st->keterangan != 'keranjang')
+                                            <a class="dropdown-item" href="{{
+                                                route('home', $st->keterangan)
+                                            }}">
+                                                {{ ucfirst($st->keterangan) }}
+                                            </a>
                                         @endif
-                                    </a>
-                                    {{-- <a class="dropdown-item" href="{{ route('kategori', $d->keterangan) }}">
-                                        @if ($d->keterangan == 'alat')
-                                            Alat Pesta
-                                        @else
-                                            {{ ucfirst($d->keterangan) }}
-                                        @endif
-                                    </a> --}}
-                                @endforeach
-                            </div>
-                        </li>
+                                    @endforeach
+                                </div>
+                            </li>
+                            <li class="nav-item dropdown">
+                                <a id="kategoriDropdown" class="nav-link dropdown-toggle" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>Kategori</a>
+                                <div class="dropdown-menu" aria-labelledby="kategoriDropdown">
+                                    @php
+                                    $all_kategori = \App\Model\StatusKategori::all();
+                                    @endphp
+                                    @foreach ($all_kategori as $kategori)
+                                        <a class="dropdown-item" href="{{
+                                            route('kategori.index', $kategori->keterangan)
+                                        }}">
+                                            @if ($kategori->keterangan == 'alat')
+                                                Alat Pesta
+                                            @else
+                                                {{ ucfirst($kategori->keterangan) }}
+                                            @endif
+                                        </a>
+                                    @endforeach
+                                </div>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="{{ route('paket.index') }}">Paket</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="{{ route('iklan.index') }}">Iklan</a>
+                            </li>
+                        @endauth
                     </ul>
 
                     <!-- Right Side Of Navbar -->
@@ -106,7 +118,7 @@
                                 </a>
 
                                 <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdown">
-                                    {{-- <a class="dropdown-item" href="{{ route('password.reset') }}">{{ __('Reset Password') }}</a> --}}
+                                    <a class="dropdown-item" href="{{ route('password.reset') }}">{{ __('Reset Password') }}</a>
                                     <a class="dropdown-item" href="{{ route('logout') }}"
                                        onclick="event.preventDefault();
                                                      document.getElementById('logout-form').submit();">

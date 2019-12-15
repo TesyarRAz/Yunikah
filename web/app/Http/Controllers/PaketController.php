@@ -21,16 +21,14 @@ class PaketController extends Controller
      */
     public function index()
     {
-        $data = request()->filterQuery->get();
+        $data = request()->filterQuery->with('image')->with('data')->get();
 
         if (request()->routeIs('api'))
         {
             return response($data, 200);
         }
 
-        $status_kategori = StatusKategori::all();
-
-        return view('paket.index', compact('data', 'status_kategori'));
+        return view('paket.index', compact('data'));
     }
 
     /**
@@ -40,9 +38,7 @@ class PaketController extends Controller
      */
     public function create()
     {
-        $status_kategori = StatusKategori::all();
-
-        return view('paket.create', compact('status_kategori'));
+        return view('paket.create');
     }
 
     /**
@@ -87,7 +83,7 @@ class PaketController extends Controller
      */
     public function show($id)
     {
-        $data = Paket::find($id);
+        $data = Paket::with('image')->with('data')->with('data.kategori.image')->find($id);
 
         if (request()->routeIs('api'))
         {
@@ -104,9 +100,8 @@ class PaketController extends Controller
     public function edit($id)
     {
         $data = Paket::findOrFail($id);
-        $status_kategori = StatusKategori::all();
 
-        return view('paket.edit', compact('status_kategori', 'data'));
+        return view('paket.edit', compact('data'));
     }
 
     /**

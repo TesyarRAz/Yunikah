@@ -4,16 +4,15 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 
-use App\Model\Kategori;
+use App\Model\Iklan;
 use App\Model\StatusKategori;
 use App\Model\Asset;
-use App\Model\Mitra;
 
 use DB;
 use File;
 use Str;
 
-class KategoriController extends Controller
+class IklanController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -22,28 +21,14 @@ class KategoriController extends Controller
      */
     public function index()
     {
-        $jenis = strtolower(request()->jenis);
-        $data = [];
-
-        $status_kategori = StatusKategori::where('keterangan', $jenis)->first();
-
-        if (!empty($status_kategori))
-        {
-            $data = request()->filterQuery->with('image')->where('status_kategori_id', $status_kategori->id)->get();
-        }
-        else
-        {
-            return response($data, 404);
-        }
+        $data = request()->filterQuery->with('image')->get();
 
         if (request()->routeIs('api'))
         {
             return response($data, 200);
         }
 
-        // $status_kategori = StatusKategori::all();
-
-        return view('kategori.index', compact('data', 'jenis'));
+        return view('iklan.index', compact('data'));
     }
 
     /**
@@ -53,11 +38,7 @@ class KategoriController extends Controller
      */
     public function create()
     {
-        $selected_kategori = StatusKategori::where('keterangan', strtolower(request()->jenis))->firstOrFail();
-        $status_kategori = StatusKategori::all();
-        $mitra = Mitra::all();
-
-        return view('kategori.create', compact('selected_kategori', 'status_kategori', 'mitra'));
+        return view('iklan.create');
     }
 
     /**
@@ -70,18 +51,11 @@ class KategoriController extends Controller
     {
         $this->validate($request, [
             'name' => 'required',
-            'harga' => 'required|numeric',
-            'mitra_id' => 'required|exists:mitras,id',
             'image' => 'required|file|image|mimes:jpg,png,jpeg'
         ]);
 
-        $status_kategori = StatusKategori::where('keterangan', strtolower(request()->jenis))->firstOrFail();
-
-        $data = new Kategori;
+        $data = new Iklan;
         $data->name = $request->name;
-        $data->harga = $request->harga;
-        $data->status_kategori_id = $status_kategori->id;
-        $data->mitra_id = $request->mitra_id;
 
         if ($request->hasFile('image') && $request->image->isValid())
         {
@@ -94,9 +68,14 @@ class KategoriController extends Controller
             $request->image->move(public_path('uploads/images'), $asset->name);
         }
 
+        if ($request->filled('keterangan'))
+        {
+            $data->keterangan = $request->keterangan;
+        }
+
         $data->save();
 
-        return redirect()->route('kategori.index', request()->jenis)->with('status', 'Berhasil ditambahkan');
+        return redirect()->route('iklan.index')->with('status', 'Berhasil ditambahkan');
     }
 
     /**
@@ -105,9 +84,9 @@ class KategoriController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show($jenis, $id)
+    public function show($id)
     {
-        $data = Kategori::with('image')->find($id);
+        $data = Iklan::with('image')->find($id);
 
         if (request()->routeIs('api'))
         {
@@ -121,14 +100,12 @@ class KategoriController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function edit($jenis, $id)
+    public function edit($id)
     {
-        $data = Kategori::findOrFail($id);
-        $selected_kategori = StatusKategori::where('keterangan', strtolower(request()->jenis))->firstOrFail();
-        // $status_kategori = StatusKategori::all();
-        $mitra = Mitra::all();
+        $data = Iklan::findOrFail($id);
+        $status_kategori = StatusKategori::all();
 
-        return view('kategori.edit', compact('selected_kategori', 'data', 'mitra'));
+        return view('iklan.edit', compact('status_kategori', 'data'));
     }
 
     /**
@@ -138,23 +115,15 @@ class KategoriController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $jenis, $id)
+    public function update(Request $request, $id)
     {
         $this->validate($request, [
             'name' => 'required',
-            'harga' => 'required|numeric',
-            'mitra_id' => 'required|exists:mitras,id',
             'image' => 'file|image|mimes:jpg,png,jpeg'
         ]);
 
-        $status_kategori = StatusKategori::where('keterangan', strtolower(request()->jenis))->firstOrFail();
-
-        $data = Kategori::findOrFail($id);
+        $data = Iklan::findOrFail($id);
         $data->name = $request->name;
-        $data->harga = $request->harga;
-        $data->status_kategori_id = $status_kategori->id;
-        $data->mitra_id = $request->mitra_id;
-
         if ($request->hasFile('image') && $request->image->isValid())
         {
             $asset = Asset::create([
@@ -166,9 +135,14 @@ class KategoriController extends Controller
             $request->image->move(public_path('uploads/images'), $asset->name);
         }
 
+        if ($request->filled('keterangan'))
+        {
+            $data->keterangan = $request->keterangan;
+        }
+
         $data->save();
 
-        return redirect()->route('kategori.index', request()->jenis)->with('status', 'Berhasil diedit');
+        return redirect()->route('iklan.index')->with('status', 'Berhasil diedit');
     }
 
     /**
@@ -179,9 +153,9 @@ class KategoriController extends Controller
      */
     public function destroy($id)
     {
-        $data = Kategori::findOrFail($id);
+        $data = Iklan::findOrFail($id);
 
-        return redirect()->route('kategori.index', request()->jenis)
+        return redirect()->route('iklan.index')
         ->with('status', $data->delete() ? 'Berhasil dihapus' : 'Gagal dihapus');
     }
 }

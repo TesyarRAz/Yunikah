@@ -12,7 +12,8 @@
 */
 
 
-Auth::routes(['register' => false, 'passwordRequest' => false]);
+Route::get('/login', 'Auth\LoginController@showLoginForm')->name('login');
+Route::post('/login', 'Auth\LoginController@login')->name('login');
 
 Route::get('/', function() {
 	return redirect()->route('login');
@@ -33,6 +34,14 @@ Route::middleware(['auth:web', 'user.access:admin'])->group(function() {
 	->middleware('filter.request:DataPaket')->resource('paket.data', 'DataPaketController');
 
 	Route::middleware('filter.request:Mitra')->resource('mitra', 'MitraController');
-});
+	Route::middleware('filter.request:Iklan')->resource('iklan', 'IklanController');
+	
+	Route::post('/logout', 'Auth\LoginController@logout')->name('logout');
+	Route::get('/password/reset', 'Auth\ResetPasswordController@showResetForm')->name('password.reset');
+	Route::post('/password/reset', 'Api\UserController@changePassword')->name('password.update');
 
-Route::get('/home', 'HomeController@index')->name('home');
+	
+
+	Route::get('/home/{status?}', 'HomeController@index')->name('home');
+	Route::get('/home/rubah/pesanan/{id}/{status}', 'HomeController@rubahPesanan')->name('home.rubahpesanan');
+});

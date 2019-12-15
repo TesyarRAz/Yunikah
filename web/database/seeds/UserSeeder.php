@@ -18,6 +18,9 @@ class UserSeeder extends Seeder
         $status_user = StatusUser::create([
     		'keterangan' => 'admin'
     	]);
+        $status_user = StatusUser::create([
+            'keterangan' => 'user'
+        ]);
 
         $user = User::create([
         	'name' => 'DAADasdsd',

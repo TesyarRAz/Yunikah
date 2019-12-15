@@ -6,6 +6,11 @@
         <div class="col-md-5 col-12 mx-auto">
             <div class="container">
                 <h2 align="center">Login Yunikah</h2>
+                @if (Session::has('status'))
+                    <div class="alert alert-warning">
+                        {{ Session::get('status') }}
+                    </div>
+                @endif
 
                 <form class="form-group my-5" action="{{ route('login') }}" method="POST">
                     @csrf

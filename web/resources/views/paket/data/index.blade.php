@@ -18,10 +18,10 @@
                         <th>Nama Kategori</th>
                         <th>Mitra</th>
         				<th>Jenis</th>
-                        <th colspan="2">Opsi</th>
+                        <th>Opsi</th>
         			</tr>
         		</thead>
-        		<tbody>
+        		<tbody class="bg-white">
                     @php $i = 1; @endphp
         			@foreach ($data as $d)
                         <tr>
@@ -29,9 +29,6 @@
                             <td>{{ $d->kategori->name }}</td>
                             <td>{{ $d->kategori->mitra->name }}</td>
                             <td>{{ ucfirst(strtolower($d->kategori->status->keterangan)) }}</td>
-                            <td>
-                                <a class="btn btn-danger" href="{{ route('paket.data.edit', [request()->paket, $d->id]) }}">Edit</a>
-                            </td>
                             <td>
                                 <form action="{{ route('paket.data.destroy', [request()->paket, $d->id]) }}" method="POST" onsubmit="return confirm('Yakin ingin dihapus?')">
                                     @csrf

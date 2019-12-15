@@ -21,7 +21,7 @@
                         <th colspan="2">Opsi</th>
         			</tr>
         		</thead>
-        		<tbody>
+        		<tbody class="bg-white">
                     @php $i = 1; @endphp
         			@foreach ($data as $d)
                         <tr>

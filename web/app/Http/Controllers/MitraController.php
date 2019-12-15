@@ -21,16 +21,14 @@ class MitraController extends Controller
      */
     public function index()
     {
-        $data = request()->filterQuery->get();
+        $data = request()->filterQuery->with('image')->get();
 
         if (request()->routeIs('api'))
         {
             return response($data, 200);
         }
 
-        $status_kategori = StatusKategori::all();
-
-        return view('mitra.index', compact('data', 'status_kategori'));
+        return view('mitra.index', compact('data'));
     }
 
     /**
@@ -40,9 +38,7 @@ class MitraController extends Controller
      */
     public function create()
     {
-        $status_kategori = StatusKategori::all();
-
-        return view('mitra.create', compact('status_kategori'));
+        return view('mitra.create');
     }
 
     /**
@@ -85,7 +81,7 @@ class MitraController extends Controller
      */
     public function show($id)
     {
-        $data = Mitra::find($id);
+        $data = Mitra::with('image')->find($id);
 
         if (request()->routeIs('api'))
         {

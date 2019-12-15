@@ -16,19 +16,26 @@ use Illuminate\Http\Request;
 Route::prefix('auth')->group(function() {
 	Route::post('/login', 'UserController@login');
 	Route::post('/register', 'UserController@register');
+	
+	Route::middleware('auth:api')->group(function() {
+		Route::put('/user/update', 'UserController@updateData');
+		Route::get('/auth/logout', 'UserController@logout');
+	});
+
 });
 
 Route::namespace('\App\Http\Controllers')->name('api')->group(function() {
+
 	Route::prefix('/kategori/{jenis}')->group(function() {
 		Route::get('/', 'KategoriController@index')->middleware('filter.request:Kategori');
 		Route::get('/{id}', 'KategoriController@show');
 
-		Route::prefix('')
+		Route::middleware('auth:api')->get('/{id}/pesan', 'Api\PemesananController@pesan_satuan');
 	});
 
 	Route::prefix('/mitra')->group(function() {
 		Route::get('/', 'MitraController@index')->middleware('filter.request:Mitra');
-		Route::get('//{id}', 'MitraController@show');
+		Route::get('/{id}', 'MitraController@show');
 	});
 
 	Route::prefix('/paket')->group(function() {
@@ -36,13 +43,21 @@ Route::namespace('\App\Http\Controllers')->name('api')->group(function() {
 		Route::get('/{paket}', 'PaketController@show');
 		Route::get('/{paket}/data', 'DataPaketController@index')->middleware('filter.request:DataPaket');
 		Route::get('/{paket}/data/{id}', 'DataPaketController@show');
+
+		Route::middleware('auth:api')->get('/{paket}/pesan', 'Api\PemesananController@pesan_paket');
 	});
 
-	Route::prefix('/pemesanan')->group(function() {
-		Route::get('/', 'PemesananController@index')->middleware('filter.request:Pemesanan');
-	});
-});
+	Route::middleware('auth:api')->prefix('/pemesanan')->group(function() {
+		Route::get('/', 'Api\PemesananController@index')->middleware('filter.request:Pemesanan');
+		Route::get('/{id_pemesanan}', 'Api\PemesananController@show');
+		Route::delete('/hapus/{id_pemesanan}', 'Api\PemesananController@hapus_pemesanan');
+		Route::delete('/hapus/satuan/{id_data_pemesanan}', 'Api\PemesananController@hapus_satuan');
 
-Route::middleware('auth:api')->group(function() {
-	Route::get('/auth/logout', 'UserController@logout');
+		Route::post('/checkout', 'Api\PemesananController@checkout');
+	});
+
+	Route::prefix('/iklan')->group(function() {
+		Route::get('/', 'IklanController@index')->middleware('filter.request:Iklan');
+		Route::get('/{id}', 'IklanController@show');
+	});
 });

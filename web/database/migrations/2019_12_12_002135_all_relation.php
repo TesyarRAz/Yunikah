@@ -45,6 +45,10 @@ class AllRelation extends Migration
             $table->foreign('pemesanan_id')->references('id')->on('pemesanans');
             $table->foreign('kategori_id')->references('id')->on('kategoris');
         });
+
+        Schema::table('iklans', function(Blueprint $table) {
+            $table->foreign('image_id')->references('id')->on('assets');
+        });
     }
 
     /**

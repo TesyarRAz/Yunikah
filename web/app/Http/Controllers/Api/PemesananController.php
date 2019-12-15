@@ -10,36 +10,31 @@ use App\Model\DataPemesanan;
 use App\Model\StatusPemesanan;
 use App\Model\Paket;
 use App\Model\Kategori;
+use App\User;
 
 use Auth;
+use DB;
+use Validator;
 
 class PemesananController extends Controller
 {
     public function index()
     {
-        $pemesanan = Pemesanan::with('data')->where([
+        $pemesanan = Pemesanan::with('data')->with('status')->where([
             'user_id' => Auth::id()
         ])->get();
 
-        $total_harga = 0;
-        foreach ($pemesanan as $p)
-        {
-            $total_harga += $p->harga;
-        }
-
-        return response(array_merge($pemesanan, compact('total_harga')), 200);
+        return response($pemesanan, 200);
     }
 
     public function show($pemesanan_id)
     {
-        $pemesanan = Pemesanan::with('data')->where([
+        $pemesanan = Pemesanan::with('data')->with('status')->where([
             'user_id' => Auth::id(),
             'id' => $pemesanan_id
-        ])->first()->toArray();
+        ])->first();
 
-        $harga = $pemesanan->harga();
-
-        return response(array_merge($pemesanan, compact('harga')), 200);
+        return response($pemesanan, 200);
     }
 
     public function pesan_satuan(Request $request, $jenis, $kategori_id)
@@ -49,7 +44,8 @@ class PemesananController extends Controller
 
     	$pemesanan = Pemesanan::updateOrCreate([
     		'user_id' => Auth::id(),
-    		'status_pemesanan_id' => $status->id
+    		'status_pemesanan_id' => $status->id,
+            'jenis' => 'SATUAN'
     	], [
     			'user_id' => Auth::id(),
 				'status_pemesanan_id' => $status->id,
@@ -59,6 +55,9 @@ class PemesananController extends Controller
 				'harga' => 0
     		]
     	);
+
+        $pemesanan->harga = $pemesanan->harga + $kategori->harga;
+        $pemesanan->save();
 
     	$data_pemesanan = DataPemesanan::create([
     		'pemesanan_id' => $pemesanan->id,
@@ -71,13 +70,13 @@ class PemesananController extends Controller
     public function pesan_paket(Request $request, $paket_id)
     {
     	$paket = Paket::findOrFail($paket_id);
-    	$status = StatusPemesanan::where('keterangan', 'diterima')->first();
+    	$status = StatusPemesanan::where('keterangan', 'keranjang')->first();
 
     	$pemesanan = Pemesanan::create([
     		'user_id' => Auth::id(),
     		'status_pemesanan_id' => $status->id,
-    		'alamat' => $request->alamat,
-    		'tanggal_pernikahan' => $request->tanggal_pernikahan,
+    		'alamat' => '',
+    		'tanggal_pernikahan' => date('Y-m-d'),
     		'jenis' => 'PAKET',
     		'harga' => $paket->harga
     	]);
@@ -106,18 +105,53 @@ class PemesananController extends Controller
         }
 
     	$status = StatusPemesanan::where('keterangan', 'keranjang')->first();
-    	$status_dikirim = StatusPemesanan::where('keterangan' => 'dikirim')->first();
+    	$status_dikirim = StatusPemesanan::where('keterangan', 'dikirim')->first();
 
     	$pemesanan = Pemesanan::where([
     		'user_id' => Auth::id(),
     		'status_pemesanan_id' => $status->id
-    	])->first();
+    	])->get();
 
-        $pemesanan->status_pemesanan_id = $status_dikirim->id;
-        $pemesanan->alamat = $request->alamat;
-        $pemesanan->tanggal_pernikahan = $request->tanggal_pernikahan;
-        $pemesanan->save();
+        foreach ($pemesanan as $p)
+        {
+            $p->status_pemesanan_id = $status_dikirim->id;
+            $p->alamat = $request->alamat;
+            $p->tanggal_pernikahan = $request->tanggal_pernikahan;
+            $p->save();
+        }
 
         return response(['message' => 'Berhasil checkout, tinggal tunggu respon admin'], 200);
+    }
+
+    public function hapus_pemesanan($id_pemesanan)
+    {
+        $pemesanan = Pemesanan::with('data')->where([
+            'user_id' => Auth::id(),
+            'id' => $id_pemesanan
+        ])->firstOrFail();
+
+        DB::table('data_pemesanans')->where('pemesanan_id', $id_pemesanan)->delete();
+        $pemesanan->delete();
+
+        return response(['message' => 'Berhasil hapus pemesanan']);
+    }
+
+    public function hapus_satuan($id_data_pemesanan)
+    {
+        $data_pemesanan = DataPemesanan::find($id_data_pemesanan);
+        
+        if ($data_pemesanan->pemesanan->user_id == Auth::id())
+        {
+            if ($data_pemesanan->pemesanan->jenis == 'PAKET')
+            {
+                return response(['message' => '1 paket, tidak bisa dihapus'], 200);
+            }
+
+            $data_pemesanan->delete();
+
+            return response(['message' => 'Berhasil hapus data pemesanan'], 200);
+        }
+
+        return response(['error' => 'Unauthorized User'], 401);
     }
 }

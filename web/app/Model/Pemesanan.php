@@ -4,11 +4,15 @@ namespace App\Model;
 
 use Illuminate\Database\Eloquent\Model;
 
+use App\User;
+
 class Pemesanan extends Model
 {
     protected $fillable = [
     	'user_id', 'status_pemesanan_id', 'alamat', 'tanggal_pernikahan', 'harga', 'jenis'
     ];
+
+    protected $appends = ['total_harga'];
 
 	public function data()
 	{
@@ -22,10 +26,10 @@ class Pemesanan extends Model
 
 	public function user()
 	{
-		return $this->belongsTo(User::class, 'user_id');
+		return $this->belongsTo(User::class);
 	}
 
-	public function harga()
+	public function getTotalHargaAttribute()
 	{
 		if ($this->jenis == 'PAKET')
 			return $this->harga;
@@ -33,7 +37,7 @@ class Pemesanan extends Model
 		$total_harga = 0;
 		foreach ($this->data as $d)
 		{
-			$total_harga += $d->harga;
+			$total_harga += $d->kategori->harga;
 		}
 
 		return $total_harga;

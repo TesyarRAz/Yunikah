@@ -8,7 +8,7 @@
             {{ Session::get('status') }}
         </div>
     @endif
-	<h2 class="text-center">Daftar Mitra</h2>
+	<h2 class="text-center">Daftar Iklan</h2>
     <div class="row align-items-center">
         <div class="col-12 mx-auto">
         	<table class="table table-stripped table-white table-bordered">
@@ -30,10 +30,10 @@
                                 <a class="btn btn-success" href="#" @if(!empty($d->image)) onclick="showModal('{{ asset('uploads/images/' . $d->image->name)}}')" @endif>Buka</a>
                             </td>
                             <td>
-                                <a class="btn btn-danger" href="{{ route('mitra.edit', $d->id) }}">Edit</a>
+                                <a class="btn btn-danger" href="{{ route('iklan.edit', $d->id) }}">Edit</a>
                             </td>
                             <td>
-                                <form action="{{ route('mitra.destroy', $d->id) }}" method="POST" onsubmit="return confirm('Yakin ingin dihapus?')">
+                                <form action="{{ route('iklan.destroy', $d->id) }}" method="POST" onsubmit="return confirm('Yakin ingin dihapus?')">
                                     @csrf
                                     @method('DELETE')
                                     <button class="btn btn-warning">Hapus</button>
@@ -44,7 +44,7 @@
         		</tbody>
         	</table>
 
-            <a class="btn btn-primary" href="{{ route('mitra.create') }}">
+            <a class="btn btn-primary" href="{{ route('iklan.create') }}">
                 Tambah Data Baru
             </a>
         </div>

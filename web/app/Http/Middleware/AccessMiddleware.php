@@ -4,6 +4,7 @@ namespace App\Http\Middleware;
 
 use Closure;
 use Auth;
+use Route;
 
 use App\User;
 use App\Model\StatusUser;
@@ -25,7 +26,18 @@ class AccessMiddleware
         if (!empty($status))
         {
             if ($user->status->id != $status->id)
-                return response(['error' => 'Unauthorized User'], 401);
+            {
+                if (Route::is('api'))
+                {
+                    return response(['error' => 'Unauthorized User'], 401);
+                }
+                else
+                {
+                    Auth::logout();
+
+                    return redirect()->route('login')->with('status', 'Kau bukan admin');
+                }
+            }
         }
 
         return $next($request);
