@@ -1,91 +1,91 @@
 import 'package:flutter/material.dart';
-import 'package:yunikah/model/user.dart';
+import 'package:yunikah/network/api_service.dart';
 import 'package:yunikah/ui/home/iklan_component.dart';
+import 'package:yunikah/ui/home/mitra_component.dart';
 import 'package:yunikah/ui/home/paket_component.dart';
 
 class HomePage extends StatefulWidget {
-  static const TAG = 'home';
+  final _scaffoldKey = GlobalKey<ScaffoldState>();
+  final navigatorKey = GlobalKey<NavigatorState>();
 
-  final User authUser;
+  HomePage({Key key}) : super(key: key);
 
-  HomePage(this.authUser);
+  static HomePage of(BuildContext context) => context.ancestorWidgetOfExactType(HomePage);
 
   @override
   _HomePageState createState() => _HomePageState();
 }
 
 class _HomePageState extends State<HomePage> {
+
+  Future _iklanFuture;
+  Future _paketFuture;
+  Future _mitraFuture;
+
   @override
-  Widget build(BuildContext context) {
-    return SafeArea(
-      child: SingleChildScrollView(
-        key: UniqueKey(),
-        child: Column(
-          children: <Widget>[
-            IklanComponent(),
-            Divider(),
-            _buildSearch(),
-            Divider(),
-            _buildPaket(),
-            Divider(),
-          ],
-        ),
-      ),
-    );
+  void initState() {
+    super.initState();
+
+    var _bucket = PageStorage.of(context);
+
+    _iklanFuture = _bucket.readState(context, identifier: 'iklan');
+    _paketFuture = _bucket.readState(context, identifier: 'paket');
+    _mitraFuture = _bucket.readState(context, identifier: 'mitra');
+
+    _iklanFuture ??= ApiService.instance.allIklan()..then((_data) {
+      PageStorage.of(context).writeState(context, _iklanFuture, identifier: 'iklan');
+
+      return _data;
+    });
+    _paketFuture ??= ApiService.instance.allPaket()..then((_data) {
+      PageStorage.of(context).writeState(context, _paketFuture, identifier: 'paket');
+
+      return _data;
+    });
+    _mitraFuture ??= ApiService.instance.allMitra()..then((_data) {
+      PageStorage.of(context).writeState(context, _mitraFuture, identifier: 'mitra');
+
+      return _data;
+    });
   }
 
-  Widget _buildSearch() =>
-    Padding(
-      padding: EdgeInsets.symmetric(horizontal: 10),
-      child: TextFormField(
-        textInputAction: TextInputAction.search,
-        decoration: InputDecoration(
-          hintText: 'Search',
-          border: OutlineInputBorder(gapPadding: 0),
-          suffixIcon: IconButton(
-            splashColor: Colors.transparent,
-            icon: Icon(Icons.search),
-            onPressed: () {},
-          )
-        ),
-        scrollPadding: EdgeInsets.zero,
-      ),
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      key: widget._scaffoldKey,
+      body: SafeArea(
+        child: Navigator(
+          key: widget.navigatorKey,
+          initialRoute: '',
+          onGenerateRoute: (setting) {
+            return MaterialPageRoute(
+              settings: setting,
+              builder: (_) {
+                return SingleChildScrollView(
+                  child: Column(
+                    children: <Widget>[
+                      IklanComponent(
+                        future: _iklanFuture,
+                        height: 200.0,
+                      ),
+                      Divider(),
+                      PaketComponent(
+                        future: _paketFuture,
+                        height: 200.0
+                      ),
+                      Divider(),
+                      MitraComponent(
+                        future: _mitraFuture,
+                        height: 200.0,
+                      ),
+                    ],
+                  ),
+                );
+              }
+            );
+          },
+        )
+      )
     );
-  
-  Widget _buildPaket() =>
-    Padding(
-      padding: EdgeInsets.symmetric(horizontal: 10),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: <Widget>[
-          Row(
-            children: <Widget>[
-              Text('Paket Paling ', style: TextStyle(color: Colors.black54, fontSize: 15)),
-              Text('Hot', style: TextStyle(color: Colors.red, fontSize: 20),)
-            ],
-          ),
-          Padding(
-            padding: EdgeInsets.symmetric(vertical: 10),
-            child: PaketComponent(),
-          )
-        ],
-      ),
-    );
+  }
 }
-
-// List<Aksi> _aksis = [
-//   Aksi(name: 'Home', icon: Icons.add_box),
-//   Aksi(name: 'Setting', icon: Icons.add_circle),
-//   Aksi(name: 'Setting', icon: Icons.add_circle),
-//   Aksi(name: 'Setting', icon: Icons.add_circle),
-//   Aksi(name: 'Setting', icon: Icons.add_circle),
-//   Aksi(name: 'Setting', icon: Icons.add_circle),
-//   Aksi(name: 'Setting', icon: Icons.add_circle),
-// ];
-
-// class Aksi {
-//   String name;
-//   IconData icon;
-
-//   Aksi({this.name, this.icon});
-// }

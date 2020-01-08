@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:yunikah/model/user.dart';
 import 'package:yunikah/network/api_service.dart';
 import 'package:yunikah/ui/auth/register_page.dart';
+import 'package:yunikah/ui/component/animation.dart';
 import 'package:yunikah/ui/menu_page.dart';
 
 class LoginPage extends StatefulWidget {
@@ -139,50 +140,39 @@ class _LoginPageState extends State<LoginPage> {
         barrierDismissible: false,
         builder: (context) {
           return Dialog(
-            child: Padding(
-              padding: EdgeInsets.all(20),
-              child: Row(
-                children: <Widget>[
-                  CircularProgressIndicator(),
-                  Padding(
-                    padding: EdgeInsets.only(left: 10),
-                    child: Text('Loading...'),
-                  )
-                ],
-              ),
-            )
+            child: createLoadingAnimation()
           );
         }
       );
 
-      ApiService().login(username, password).then((user) {
-        if (user == null) {
+      ApiService.instance.login(username, password).then((result) {
+        Navigator.of(context).pop();
+        if (result.data == null) {
+          ApiError _apiError = result as ApiError;
           showDialog(
             context: context,
             builder: (_) {
               return Dialog(
                 child: Padding(
                   padding: EdgeInsets.all(20),
-                  child: Text('Username atau password salah!'),
+                  child: Text(_apiError.message),
                 ),
                 insetAnimationCurve: Curves.fastOutSlowIn,
                 insetAnimationDuration: Duration(seconds: 2),
               );
             }
-          ).then((_) {
-            
-          });
+          );
           
           return;
         }
 
-        widget.callbackUser(user);
+        // widget.callbackUser(result.data);
 
-        Navigator.of(context).pushReplacement(
-          MaterialPageRoute(
-            builder: (_) => MenuPage(user)
+        Navigator.of(context).pushReplacement(MaterialPageRoute(
+          builder: (_) => MenuPage(
+            user: result.data,
           )
-        );
+        ));
       }).then((_) {
           setState(() {
             _usernameController.text = '';

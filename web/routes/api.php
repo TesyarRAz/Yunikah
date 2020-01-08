@@ -19,7 +19,7 @@ Route::prefix('auth')->group(function() {
 	
 	Route::middleware('auth:api')->group(function() {
 		Route::put('/user/update', 'UserController@updateData');
-		Route::get('/auth/logout', 'UserController@logout');
+		Route::post('/auth/logout', 'UserController@logout');
 	});
 
 });
@@ -59,5 +59,11 @@ Route::namespace('\App\Http\Controllers')->name('api')->group(function() {
 	Route::prefix('/iklan')->group(function() {
 		Route::get('/', 'IklanController@index')->middleware('filter.request:Iklan');
 		Route::get('/{id}', 'IklanController@show');
+	});
+
+	Route::get('/status/kategori', function() {
+		$status = \App\Model\StatusKategori::all();
+
+		return response($status, 200);
 	});
 });

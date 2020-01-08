@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:yunikah/ui/auth/login_page.dart';
+import 'package:yunikah/ui/menu_page.dart';
 
 class SplashPage extends StatefulWidget {
 
@@ -28,7 +28,7 @@ class _SplashPageState extends State<SplashPage> with SingleTickerProviderStateM
     _animationController.addListener(() => setState(() {}));
 
     Future.delayed(Duration(seconds: 5), () {
-      Navigator.of(context).pushReplacementNamed(LoginPage.TAG);
+      Navigator.of(context).pushReplacementNamed(MenuPage.TAG);
     });
 
     _animationController.forward();
@@ -36,9 +36,8 @@ class _SplashPageState extends State<SplashPage> with SingleTickerProviderStateM
 
   @override
   void dispose() {
-    super.dispose();
-
     _animationController.dispose();
+    super.dispose();
   }
 
   @override

@@ -43,7 +43,7 @@ class Kategori {
     name: data['name'],
     harga: data['harga'],
     image: Asset.parseFromJson(data['image']),
-    // statusKategori: StatusKategori.parseFromJson(data['status'])
+    statusKategori: StatusKategori.parseFromJson(data['status'])
   );
 }
 

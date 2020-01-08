@@ -1,78 +1,214 @@
+import 'dart:io';
+
 import 'package:http/http.dart' show Client;
 import 'dart:convert';
 
 import 'package:yunikah/model/iklan.dart';
 import 'package:yunikah/model/kategori.dart';
+import 'package:yunikah/model/mitra.dart';
 import 'package:yunikah/model/paket.dart';
+import 'package:yunikah/model/pemesanan.dart';
 import 'package:yunikah/model/user.dart';
 
+class ApiResult<T> {
+  final T data;
+
+  ApiResult(this.data);
+}
+
+class ApiSuccess<T> extends ApiResult<T> {
+  ApiSuccess(T data) : super(data);
+}
+
+class ApiError<T> extends ApiResult<T> {
+  final String message;
+  final int statusCode;
+
+  ApiError(this.message, [this.statusCode]) : super(null);
+}
+
 abstract class ApiInterface {
-  Future<User> login(String username, String password);
-  Future<List<Kategori>> allKategori(String kategoriName);
-  Future<List<Paket>> allPaket();
-  Future<List<Iklan>> allIklan();
+  Future<ApiResult<User>> login(String username, String password);
+
+  // Need Auth
+  Future<ApiResult<bool>> logout(User authUser);
+  Future<ApiResult<bool>> pesanSatuan(User authUser, Kategori kategori);
+  Future<ApiResult<bool>> hapusSatuan(User authUser, int idDataPemesanan);
+  Future<ApiResult<List<Pemesanan>>> allPesanan(User authUser);
+
+  Future<ApiResult<List<Kategori>>> allKategori(String kategoriName);
+  Future<ApiResult<List<Paket>>> allPaket();
+  Future<ApiResult<List<Iklan>>> allIklan();
+  Future<ApiResult<List<Mitra>>> allMitra();
 }
 
 class ApiService extends ApiInterface {
   static const BASE_HOST = 'http://192.168.43.14/';
   static const HOST_API = BASE_HOST + 'api/';
 
+  static ApiService _instance = ApiService._();
+  static ApiService get instance => _instance;
+
   final Client _client = Client();
 
-  final User authUser;
-
-  ApiService({
-    this.authUser
-  });
+  ApiService._();
 
   @override
-  Future<List<Iklan>> allIklan() async =>
-    await _client.get(HOST_API + 'iklan').then((_response) {
-      
+  Future<ApiResult<List<Iklan>>> allIklan() async {
+    try {
+      var _response = await _client.get(HOST_API + 'iklan');
       if (_response.statusCode == 200) {
-        return iklanFromJson(jsonDecode(_response.body));
+        return ApiSuccess(iklanFromJson(jsonDecode(_response.body)));
       }
 
-      return null;
-    });
+      return ApiError<List<Iklan>>('Tidak ada iklan', _response.statusCode);
+    } on SocketException {
+      return ApiError<List<Iklan>>('Connection Error', -1);
+    }
+  }
 
   @override
-  Future<List<Kategori>> allKategori(String kategoriName) async =>
-    await _client.get(HOST_API + 'kategori/$kategoriName')
-    .then((_response) {
-       if (_response.statusCode == 200) {
-        return kategoriFromJson(jsonDecode(_response.body));
-      }
-
-      return null;
-    });
-
-  @override
-  Future<List<Paket>> allPaket() async =>
-    await _client.get(HOST_API + 'paket')
-    .then((_response) {
+  Future<ApiResult<List<Kategori>>> allKategori(String kategoriName) async {
+    try {
+      var _response = await _client.get(HOST_API + 'kategori/$kategoriName');
 
       if (_response.statusCode == 200) {
-        return paketFromJson(jsonDecode(_response.body));
+        return ApiSuccess(kategoriFromJson(jsonDecode(_response.body)));
       }
 
-      return null;
-    });
+      return ApiError<List<Kategori>>('Tidak ada kategori', _response.statusCode);
+    } on SocketException {
+      return ApiError<List<Kategori>>('Connection Error', -1);
+    }
+  }
+
   @override
-  Future<User> login(String username, String password) async =>
-    await _client.post(HOST_API + 'auth/login', body: {
-      'username' : username,
-      'password' : password
-    }).then((_response) {
+  Future<ApiResult<List<Paket>>> allPaket() async {
+    try {
+      var _response = await _client.get(HOST_API + 'paket');
+      if (_response.statusCode == 200) {
+        return ApiSuccess(paketFromJson(jsonDecode(_response.body)));
+      }
+
+      return ApiError<List<Paket>>('Tidak ada paket', _response.statusCode);
+    } on SocketException {
+      return ApiError<List<Paket>>('Connection Error', -1);
+    }
+  }
+
+  @override
+  Future<ApiResult<List<Mitra>>> allMitra() async {
+    try {
+      var _response = await _client.get(HOST_API + 'mitra');
+      if (_response.statusCode == 200) {
+        return ApiSuccess(mitraFromJson(jsonDecode(_response.body)));
+      }
+
+      return ApiError<List<Mitra>>('Tidak ada mitra', _response.statusCode);
+    } on SocketException {
+      return ApiError<List<Mitra>>('Connection Error', -1);
+    }
+  }
+    
+
+  @override
+  Future<ApiResult<User>> login(String username, String password) async {
+    try {
+      var _response = await _client.post(HOST_API + 'auth/login', body: {
+        'username' : username,
+        'password' : password
+      });
       if (_response.statusCode == 200) {
         var map = jsonDecode(_response.body);
         var user = User.parseFromJson(map);
 
-        return user;
+        return ApiResult(user);
+      } else if (_response.statusCode == 401) {
+        return ApiError<User>('Username atau password salah!', _response.statusCode);
       }
 
-      return null;
-    });
+      return ApiError<User>('Error', 500);
+    } on SocketException {
+      return ApiError<User>('Connection Error', -1);
+    }
+  }
+
+  @override
+  Future<ApiResult<bool>> logout(User authUser) async {
+    try {
+      var _response = await _client.post(HOST_API + 'auth/logout', headers: {
+        'Authorization' : 'Bearer ${authUser.token}'
+      });
+      if (_response.statusCode == 200) {
+        return ApiResult(true);
+      } else if (_response.statusCode == 401) {
+        return ApiError<bool>('Gagal Logout', _response.statusCode);
+      }
+
+      return ApiError<bool>('Error', 500);
+    } on SocketException {
+      return ApiError<bool>('Connection Error', -1);
+    }
+  }
+
+  @override
+  Future<ApiResult<bool>> pesanSatuan(User authUser, Kategori kategori) async {
+    try {
+      var _response = await _client.get(HOST_API + 'kategori/${kategori.statusKategori.keterangan}/${kategori.id}/pesan', 
+        headers: {
+          'Authorization' : 'Bearer ${authUser.token}'
+        }
+      );
+      
+      if (_response.statusCode == 200) {
+        return ApiResult(true);
+      } else if (_response.statusCode == 401) {
+        return ApiError<bool>('Gagal Pesan', _response.statusCode);
+      }
+
+      return ApiError<bool>('Error', 500);
+    } on SocketException {
+      return ApiError<bool>('Connection Error', -1);
+    }
+  }
+
+  @override
+  Future<ApiResult<bool>> hapusSatuan(User authUser, int idDataPemesanan) async {
+    try {
+      var _response = await _client.delete(HOST_API + 'pemesanan/hapus/satuan/$idDataPemesanan', 
+        headers: {
+          'Authorization' : 'Bearer ${authUser.token}'
+        }
+      );
+      
+      if (_response.statusCode == 200) {
+        return ApiResult(true);
+      } else if (_response.statusCode == 401) {
+        return ApiError<bool>('Gagal Pesan', _response.statusCode);
+      }
+
+      return ApiError<bool>('Error', 500);
+    } on SocketException {
+      return ApiError<bool>('Connection Error', -1);
+    }
+  }
+
+  @override
+  Future<ApiResult<List<Pemesanan>>> allPesanan(User authUser) async {
+    try {
+      var _response = await _client.get(HOST_API + 'pemesanan', headers: {
+        'Authorization' : 'Bearer ${authUser.token}'
+      });
+
+      if (_response.statusCode == 200) {
+        return ApiSuccess(pemesananFromJson(jsonDecode(_response.body)));
+      }
+
+      return ApiError<List<Pemesanan>>('Tidak ada pesanan', _response.statusCode);
+    } on SocketException {
+      return ApiError<List<Pemesanan>>('Connection Error', -1);
+    }
+  }
 
   
 }

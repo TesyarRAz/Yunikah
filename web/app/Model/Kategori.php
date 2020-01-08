@@ -9,6 +9,8 @@ class Kategori extends Model
     protected $fillable = [
     	'image_id', 'mitra_id', 'status_kategori_id', 'name', 'harga'
     ];
+    
+    protected $with = ['image', 'status'];
 
     public function image()
     {

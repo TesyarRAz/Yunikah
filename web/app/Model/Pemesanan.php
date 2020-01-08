@@ -12,7 +12,8 @@ class Pemesanan extends Model
     	'user_id', 'status_pemesanan_id', 'alamat', 'tanggal_pernikahan', 'harga', 'jenis'
     ];
 
-    protected $appends = ['total_harga'];
+	protected $appends = ['total_harga'];
+	protected $with = ['data', 'status'];
 
 	public function data()
 	{

@@ -138,16 +138,22 @@ class PemesananController extends Controller
 
     public function hapus_satuan($id_data_pemesanan)
     {
-        $data_pemesanan = DataPemesanan::find($id_data_pemesanan);
+        $data_pemesanan = DataPemesanan::findOrFail($id_data_pemesanan);
+        $pemesanan = $data_pemesanan->pemesanan;
         
-        if ($data_pemesanan->pemesanan->user_id == Auth::id())
+        if ($pemesanan->user_id == Auth::id())
         {
-            if ($data_pemesanan->pemesanan->jenis == 'PAKET')
+            if ($pemesanan->jenis == 'PAKET')
             {
                 return response(['message' => '1 paket, tidak bisa dihapus'], 200);
             }
 
             $data_pemesanan->delete();
+
+            if (count($pemesanan->data) < 1)
+            {
+                $pemesanan->delete();
+            }
 
             return response(['message' => 'Berhasil hapus data pemesanan'], 200);
         }

@@ -14,7 +14,7 @@ class _LoadingViewState extends State<LoadingView> with SingleTickerProviderStat
   
   Animation<LinearGradient> _animation;
 
-  final _colors = [Colors.white, Colors.grey[300]];
+  final _colors = [Colors.white, Colors.grey];
 
   @override
   void initState() {
@@ -76,4 +76,41 @@ class _LinearGradientTween extends Tween<LinearGradient> {
 
   @override
   LinearGradient lerp(double t) => LinearGradient.lerp(begin, end, t);
+}
+
+class NoConnectionView extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Text('No Connection', style: TextStyle(
+        color: Colors.red
+      ),),
+    );
+  }
+}
+
+class NoDataView extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Text('No Data', style: TextStyle(
+        color: Colors.red
+      ),),
+    );
+  }
+}
+
+Widget createLoadingAnimation() {
+  return Padding(
+    padding: EdgeInsets.all(20),
+    child: Row(
+      children: <Widget>[
+        CircularProgressIndicator(),
+        Padding(
+          padding: EdgeInsets.only(left: 10),
+          child: Text('Loading...'),
+        )
+      ],
+    ),
+  );
 }

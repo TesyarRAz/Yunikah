@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:yunikah/ui/auth/login_page.dart';
+import 'package:yunikah/ui/component/animation.dart';
 
 class RegisterPage extends StatefulWidget {
   static const TAG = 'user.register';
@@ -152,18 +153,7 @@ class _RegisterPageState extends State<RegisterPage> {
         context: context,
         builder: (_) =>
           Dialog(
-            child: Padding(
-              padding: EdgeInsets.symmetric(vertical: 20, horizontal: 20),
-              child: Row(
-                children: <Widget>[
-                  CircularProgressIndicator(),
-                  Padding(
-                    padding: EdgeInsets.only(left: 10),
-                    child: Text('Loading...'),
-                  )
-                ],
-              ),
-            ),
+            child: createLoadingAnimation()
           )
       );
       
