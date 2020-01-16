@@ -26,7 +26,7 @@ class _KeranjangPageState extends State<KeranjangPage> {
                   child: NoConnectionView(),
                 );
               }
-              if (snapshot.data.data.isEmpty) {
+              if (snapshot.data.data == null) {
                 return NoDataView();
               }
               return Column(

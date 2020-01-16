@@ -11,7 +11,7 @@ class PaketInfo extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        leading: BackButton(),
+        leading: BackButton(color: Colors.white),
       ),
       body: Column(
         children: <Widget>[
