@@ -96,6 +96,9 @@
                             <li class="nav-item">
                                 <a class="nav-link" href="{{ route('iklan.index') }}">Iklan</a>
                             </li>
+                            <li class="nav-item">
+                            	<a class="nav-link" href="{{ route('mitra.index') }}">Mitra</a>
+                            </li>
                         @endauth
                     </ul>
 
