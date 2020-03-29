@@ -38,7 +38,10 @@ class _MenuPageState extends State<MenuPage> {
           padding: EdgeInsets.only(bottom: 40),
           child: AnimatedContainer(
             duration: Duration(seconds: 1),
-            child: _buildTabs()[index],
+            child: PageStorage(
+              bucket: _pageStorageBucket,
+              child: _buildTabs()[index]
+            ),
           ),
         ),
         Align(
@@ -50,28 +53,18 @@ class _MenuPageState extends State<MenuPage> {
   }
 
   List<Widget> _buildTabs() => [
-    PageStorage(
-      key: PageStorageKey("home"),
-      bucket: _pageStorageBucket,
-      child: HomePage()
+    HomePage(
+      key: PageStorageKey('home'),
     ),
-    Provider.of<AuthProvider>(context).isAuthorized ? PageStorage(
-      key: PageStorageKey("keranjang"),
-      bucket: _pageStorageBucket,
-      child: KeranjangPage(),
-    ) : PageStorage(
-      key: PageStorageKey("login"),
-      bucket: _pageStorageBucket,
-      child: SplashLoginPage(),
+    Provider.of<AuthProvider>(context).isAuthorized ? KeranjangPage(
+      key: PageStorageKey('keranjang'),
+    ) : SplashLoginPage(
+      key: PageStorageKey('splash_login'),
     ),
-    Provider.of<AuthProvider>(context).isAuthorized ? PageStorage(
-      key: PageStorageKey("profile"),
-      bucket: _pageStorageBucket,
-      child: ProfilePage(),
-    ) : PageStorage(
-      key: PageStorageKey("login"),
-      bucket: _pageStorageBucket,
-      child: SplashLoginPage(),
+    Provider.of<AuthProvider>(context).isAuthorized ? ProfilePage(
+      key: PageStorageKey('profile')
+    ) : SplashLoginPage(
+      key: PageStorageKey('splash_login'),
     )
   ];
 

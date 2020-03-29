@@ -1,9 +1,5 @@
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:carousel_slider/carousel_slider.dart';
-import 'package:dots_indicator/dots_indicator.dart';
 import 'package:flutter/material.dart';
-import 'package:shimmer/shimmer.dart';
-import 'package:yunikah/model/iklan.dart';
 import 'package:yunikah/model/kategori.dart';
 import 'package:yunikah/model/mitra.dart';
 import 'package:yunikah/model/sample.dart';
@@ -12,6 +8,8 @@ import 'package:yunikah/ui/home/component/iklan_component.dart';
 import 'package:yunikah/ui/home/search_page.dart';
 
 class HomePage extends StatefulWidget {
+  HomePage({Key key}) : super(key: key);
+
   @override
   State<StatefulWidget> createState() => _HomePageState();
 }
@@ -186,36 +184,40 @@ class _HomePageState extends State<HomePage> {
             )
           ],
         ),
+
+        GridView.count(
+          crossAxisCount: 2,
+          physics: NeverScrollableScrollPhysics(),
+          children: kListMitra.map((mitra) => _buildMitraItem(mitra)).toList(),
+        )
       ],
     ),
   );
 
-  Widget _buildMitraItem(Mitra mitra) => Expanded(
-    child: Card(
-      elevation: 2,
-      child: Padding(
-        padding: const EdgeInsets.all(10.0),
-        child: Column(
-          children: [
-            Expanded(
-              child: CachedNetworkImage(
-                imageUrl: mitra.image.link,
-                imageBuilder: (context, imageProvider) => Container(
-                  decoration: BoxDecoration(
-                    image: DecorationImage(
-                      image: imageProvider,
-                      fit: BoxFit.cover
-                    ),
-                  )
-                ),
-              )
-            ),
-            Text(
-              mitra.name,
-              style: Theme.of(context).textTheme.title,
+  Widget _buildMitraItem(Mitra mitra) => Card(
+    elevation: 2,
+    child: Padding(
+      padding: const EdgeInsets.all(10.0),
+      child: Column(
+        children: [
+          Expanded(
+            child: CachedNetworkImage(
+              imageUrl: mitra.image.link,
+              imageBuilder: (context, imageProvider) => Container(
+                decoration: BoxDecoration(
+                  image: DecorationImage(
+                    image: imageProvider,
+                    fit: BoxFit.cover
+                  ),
+                )
+              ),
             )
-          ]
-        ),
+          ),
+          Text(
+            mitra.name,
+            style: Theme.of(context).textTheme.title,
+          )
+        ]
       ),
     ),
   );

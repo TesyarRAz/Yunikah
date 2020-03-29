@@ -5,6 +5,8 @@ import 'package:yunikah/ui/login/login_page.dart';
 import 'package:yunikah/ui/register/register_page.dart';
 
 class SplashLoginPage extends StatelessWidget {
+  SplashLoginPage({Key key}) : super(key: key);
+  
   @override
   Widget build(BuildContext context) {
     return Scaffold(
