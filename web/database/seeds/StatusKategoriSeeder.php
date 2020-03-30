@@ -13,7 +13,14 @@ class StatusKategoriSeeder extends Seeder
      */
     public function run()
     {
-        $status = ['rias', 'hiburan', 'undangan', 'gedung', 'alat', 'photo'];
+        $status = [
+            'rias', 
+            'hiburan', 
+            'undangan', 
+            'gedung', 
+            'tenda', 
+            'photo'
+        ];
 
         foreach ($status as $d)
         {

@@ -13,7 +13,13 @@ class StatusPemesananSeeder extends Seeder
      */
     public function run()
     {
-        $status = ['keranjang', 'dikirim', 'dikonfirmasi', 'diproses', 'selesai'];
+        $status = [
+            'keranjang', 
+            'dikirim', 
+            'dikonfirmasi', 
+            'diproses', 
+            'selesai'
+        ];
 
         foreach ($status as $d)
         {

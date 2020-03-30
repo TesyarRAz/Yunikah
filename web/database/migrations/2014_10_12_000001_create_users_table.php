@@ -21,6 +21,8 @@ class CreateUsersTable extends Migration
             $table->string('password');
             $table->longText('alamat');
             $table->bigInteger('status_user_id')->unsigned();
+            $table->enum('gender', ['L', 'P'])->default('L');
+            $table->date('dob');
             $table->rememberToken();
             $table->timestamps();
         });

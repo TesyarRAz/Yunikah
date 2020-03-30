@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class DataPemesanan extends Model
 {
     protected $fillable = [
-    	'pemesanan_id', 'kategori_id'
+    	'pemesanan_id', 'kategori_id', 'data_kategori_id', 'qty'
     ];
 
     public function pemesanan()
@@ -18,5 +18,10 @@ class DataPemesanan extends Model
     public function kategori()
     {
     	return $this->belongsTo(Kategori::class);
+    }
+
+    public function dataKategori()
+    {
+        return $this->belongsTo(DataKategori::class);
     }
 }

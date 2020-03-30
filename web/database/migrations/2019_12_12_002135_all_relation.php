@@ -27,6 +27,11 @@ class AllRelation extends Migration
             $table->foreign('status_kategori_id')->references('id')->on('status_kategoris');
         });
 
+        Schema::table('data_kategoris', function(Blueprint $table) {
+            $table->foreign('kategori_id')->references('id')->on('kategoris');
+            $table->foreign('data_kategori_id')->references('id')->on('data_kategoris');
+        });
+
         Schema::table('pakets', function(Blueprint $table) {
             $table->foreign('image_id')->references('id')->on('assets');
         });

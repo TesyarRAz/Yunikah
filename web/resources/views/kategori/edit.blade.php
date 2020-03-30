@@ -4,7 +4,7 @@
 <div class="container h-100">
     <div class="row align-items-center h-100">
         <div class="col-md-5 col-12 mx-auto">
-            <div class="container">
+            <div class="card p-3">
                 <h2 align="center">Edit Data {{ ucfirst($selected_kategori->keterangan) }}</h2>
 
                 <form enctype="multipart/form-data" class="form-group my-5" action="{{ route('kategori.update', [$selected_kategori->keterangan, $selected_kategori->id]) }}" method="POST">
@@ -56,11 +56,42 @@
                         <div class="col-md-6">
                             <select class="form-control @error('mitra_id') is-invalid @enderror" id="mitra" name="mitra_id">
                                 @foreach ($mitra as $m)
-                                    <option value="{{ $m->id }}" {{ (@old('mitra_id') ?? $data->id) == $m->id ? 'selected' : ''}}>{{ $m->name }}</option>
+                                    <option value="{{ $m->id }}" {{ (@old('mitra_id') ?? $data->mitra_id) == $m->id ? 'selected' : ''}}>{{ $m->name }}</option>
                                 @endforeach
                             </select>
                             
                             @error('mitra_id')
+                                <span class="invalid-feedback" role="alert">
+                                    <strong>{{ $message }}</strong>
+                                </span>
+                            @enderror
+                        </div>
+                    </div>
+
+                    <div class="form-group row">
+                        <label for="type" class="col-md-4 col-form-label text-md-right">{{ __('Type') }}</label>
+                        <div class="col-md-6">
+                            <select class="form-control @error('type') is-invalid @enderror" id="type" name="type">
+                                @foreach (['CUSTOM', 'TERSEDIA', 'COMBO'] as $type)
+                                    <option value="{{ $type }}" {{ (@old('type') ?? $data->type) == $type ? 'selected' : ''}}>{{ $type }}</option>
+                                @endforeach
+                            </select>
+
+                            <script type="text/javascript">
+                                (function(element, hargaElement) {
+                                    element.onchange = function() {
+                                        if (element.value === 'TERSEDIA') {
+                                            hargaElement.value = 0;
+                                            hargaElement.setAttribute('disabled', '');
+                                        } else if (element.value === 'CUSTOM' || element.value === 'COMBO') {
+                                            hargaElement.removeAttribute('disabled');
+                                        }
+                                    }
+                                    element.onchange();
+                                })(document.getElementById("type"), document.getElementById('harga'));
+                            </script>
+                            
+                            @error('type')
                                 <span class="invalid-feedback" role="alert">
                                     <strong>{{ $message }}</strong>
                                 </span>

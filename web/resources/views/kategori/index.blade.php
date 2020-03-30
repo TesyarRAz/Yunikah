@@ -16,9 +16,10 @@
         			<tr>
         				<th>#</th>
         				<th>Nama</th>
+                        <th>Type</th>
                         <th>Harga</th>
                         <th>Gambar</th>
-                        <th colspan="2">Opsi</th>
+                        <th colspan="3">Opsi</th>
         			</tr>
         		</thead>
         		<tbody class="bg-white">
@@ -27,9 +28,23 @@
                         <tr>
                             <td>{{ $i }}</td>
                             <td>{{ $d->name }}</td>
-                            <td>Rp. {{ number_format($d->harga, 2, ',', '.') }}</td>
+                            <td>{{ ucfirst(strtolower($d->type)) }}</td>
                             <td>
-                                <a class="btn btn-success" href="#" @if(!empty($d->image)) onclick="showModal('{{ asset('uploads/images/' . $d->image->name)}}')" @endif>Buka</a>
+                            @if($d->type == 'TERSEDIA')
+                            DISEDIAKAN
+                            @else
+                            Rp. {{ number_format($d->harga, 2, ',', '.') }}
+                            @endif
+                            </td>
+                            <td>
+                                <a class="btn btn-success @if(empty($d->image)) btn-disabled @endif" href="#" @if(!empty($d->image)) onclick="showModal('{{ asset('uploads/images/' . $d->image->name)}}')" @endif>Buka</a>
+                            </td>
+                            <td>
+                                @if ($d->type == 'CUSTOM')
+                                    <a class="btn btn-disabled" href="#">Detail</a>
+                                @else
+                                    <a class="btn btn-primary" href="{{ route('kategori.data.index', [$jenis, $d->id]) }}">Detail</a>
+                                @endif
                             </td>
                             <td>
                                 <a class="btn btn-danger" href="{{ route('kategori.edit', [$jenis, $d->id]) }}">Edit</a>

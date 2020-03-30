@@ -3,8 +3,8 @@
 @section('content')
 <div class="container h-100">
     <div class="row align-items-center h-100">
-        <div class="col-md-5 col-12 mx-auto">
-            <div class="container">
+        <div class="col-md-7 col-12 mx-auto">
+            <div class="card p-3">
                 <h2 align="center">Tambah Data {{ ucfirst($selected_kategori->keterangan) }}</h2>
 
                 <form enctype="multipart/form-data" class="form-group my-5" action="{{ route('kategori.store', $selected_kategori->keterangan) }}" method="POST">
@@ -27,7 +27,7 @@
                         <label for="harga" class="col-md-4 col-form-label text-md-right">{{ __('Harga') }}</label>
 
                         <div class="col-md-6">
-                            <input id="harga" type="number" class="form-control @error('harga') is-invalid @enderror" name="harga" value="{{ old('harga') }}" required autocomplete="harga" autofocus>
+                            <input id="harga" type="number" class="form-control @error('harga') is-invalid @enderror" name="harga" value="{{ old('harga') ?? 0 }}" required autocomplete="harga" autofocus>
 
                             @error('harga')
                                 <span class="invalid-feedback" role="alert">
@@ -60,6 +60,37 @@
                             </select>
                             
                             @error('mitra_id')
+                                <span class="invalid-feedback" role="alert">
+                                    <strong>{{ $message }}</strong>
+                                </span>
+                            @enderror
+                        </div>
+                    </div>
+
+                    <div class="form-group row">
+                        <label for="type" class="col-md-4 col-form-label text-md-right">{{ __('Type') }}</label>
+                        <div class="col-md-6">
+                            <select class="form-control @error('type') is-invalid @enderror" id="type" name="type">
+                                @foreach (['CUSTOM', 'TERSEDIA', 'COMBO'] as $type)
+                                    <option value="{{ $type }}" {{ @old('type') }}>{{ $type }}</option>
+                                @endforeach
+                            </select>
+
+                            <script type="text/javascript">
+                                (function(element, hargaElement) {
+                                    element.onchange = function() {
+                                        if (element.value === 'TERSEDIA') {
+                                            hargaElement.value = 0;
+                                            hargaElement.setAttribute('disabled', '');
+                                        } else if (element.value === 'CUSTOM' || element.value === 'COMBO') {
+                                            hargaElement.removeAttribute('disabled');
+                                        }
+                                    }
+                                    element.onchange();
+                                })(document.getElementById("type"), document.getElementById('harga'));
+                            </script>
+                            
+                            @error('type')
                                 <span class="invalid-feedback" role="alert">
                                     <strong>{{ $message }}</strong>
                                 </span>

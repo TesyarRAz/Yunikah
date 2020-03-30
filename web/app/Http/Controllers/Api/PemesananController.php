@@ -10,6 +10,7 @@ use App\Model\DataPemesanan;
 use App\Model\StatusPemesanan;
 use App\Model\Paket;
 use App\Model\Kategori;
+use App\Model\DataKategori;
 use App\User;
 
 use Auth;
@@ -54,15 +55,70 @@ class PemesananController extends Controller
 				'jenis' => 'SATUAN',
 				'harga' => 0
     		]
-    	);
+        );
+        
+        $pemesanan->increment('harga', $kategori->harga);
 
-        $pemesanan->harga = $pemesanan->harga + $kategori->harga;
-        $pemesanan->save();
+        // $pemesanan->harga = $pemesanan->harga + $kategori->harga;
+        // $pemesanan->save();
 
-    	$data_pemesanan = DataPemesanan::create([
-    		'pemesanan_id' => $pemesanan->id,
-    		'kategori_id' => $kategori_id
-    	]);
+        if ($kategori->type == 'TERSEDIA')
+        {
+            $this->validate($request, [
+                'data_kategori' => 'required|numeric'
+            ]);
+
+            $data_kategori = DataKategori::findOrFail($request->data_kategori);
+            $data_pemesanan = DataPemesanan::create([
+                'pemesanan_id' => $pemesanan->id,
+                'kategori_id' => $kategori_id,
+                'data_kategori_id' => $data_kategori->id
+            ]);
+
+            $pemesanan->increment('harga', $kategori->harga);
+        }
+        else if ($kategori->type == 'CUSTOM')
+        {
+            $this->validate($request, [
+                'qty' => 'required|numeric'
+            ]);
+
+            $data_pemesanan = DataPemesanan::create([
+                'pemesanan_id' => $pemesanan->id,
+                'kategori_id' => $kategori_id,
+                'qty' => $request->qty
+            ]);
+
+            $pemesanan->increment('harga', $kategori->harga);
+        }
+        else if ($kategori->type == 'COMBO')
+        {
+            if (!empty($request->qty))
+            {
+                $data_pemesanan = DataPemesanan::create([
+                    'pemesanan_id' => $pemesanan->id,
+                    'kategori_id' => $kategori_id,
+                    'qty' => $request->qty
+                ]);
+    
+                $pemesanan->increment('harga', $kategori->harga);
+            }
+            elseif (!empty($request->data_kategori))
+            {
+                $data_kategori = DataKategori::findOrFail($request->data_kategori);
+                $data_pemesanan = DataPemesanan::create([
+                    'pemesanan_id' => $pemesanan->id,
+                    'kategori_id' => $kategori_id,
+                    'data_kategori_id' => $data_kategori->id
+                ]);
+    
+                $pemesanan->increment('harga', $kategori->harga);
+            }
+            else
+            {
+                return response(['message' => 'Harus pilih salah satu'], 402);
+            }
+        }
 
     	return response(['message' => 'Berhasil masukan keranjang'], 200);
     }

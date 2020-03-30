@@ -36,9 +36,7 @@ class DataPaketController extends Controller
      */
     public function create()
     {
-        $status_kategori = StatusKategori::all();
-
-        return view('paket.data.create', compact('data', 'status_kategori'));
+        return view('paket.data.create', compact('data'));
     }
 
     /**

@@ -29,7 +29,7 @@ class KategoriController extends Controller
 
         if (!empty($status_kategori))
         {
-            $data = request()->filterQuery->with('image')->where('status_kategori_id', $status_kategori->id)->get();
+            $data = request()->filterQuery->where('status_kategori_id', $status_kategori->id)->get();
         }
         else
         {
@@ -70,18 +70,25 @@ class KategoriController extends Controller
     {
         $this->validate($request, [
             'name' => 'required',
-            'harga' => 'required|numeric',
+            'harga' => 'numeric',
             'mitra_id' => 'required|exists:mitras,id',
-            'image' => 'required|file|image|mimes:jpg,png,jpeg'
+            'image' => 'required|file|image',
+            'type' => 'required|in:TERSEDIA,CUSTOM,COMBO'
         ]);
 
-        $status_kategori = StatusKategori::where('keterangan', strtolower(request()->jenis))->firstOrFail();
+        if (empty($request->harga))
+        {
+            $request->harga = 0;
+        }
+        
+        $status_kategori = StatusKategori::where('keterangan', strtolower($request->jenis))->firstOrFail();
 
         $data = new Kategori;
         $data->name = $request->name;
         $data->harga = $request->harga;
         $data->status_kategori_id = $status_kategori->id;
         $data->mitra_id = $request->mitra_id;
+        $data->type = $request->type;
 
         if ($request->hasFile('image') && $request->image->isValid())
         {
@@ -96,7 +103,9 @@ class KategoriController extends Controller
 
         $data->save();
 
-        return redirect()->route('kategori.index', request()->jenis)->with('status', 'Berhasil ditambahkan');
+        return redirect()
+        ->route('kategori.index', $request->jenis)
+        ->with('status', 'Berhasil ditambahkan');
     }
 
     /**
@@ -107,7 +116,7 @@ class KategoriController extends Controller
      */
     public function show($jenis, $id)
     {
-        $data = Kategori::with('image')->find($id);
+        $data = Kategori::findOrFail($id);
 
         if (request()->routeIs('api'))
         {
@@ -121,11 +130,10 @@ class KategoriController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function edit($jenis, $id)
+    public function edit(Request $request, $jenis, $id)
     {
         $data = Kategori::findOrFail($id);
-        $selected_kategori = StatusKategori::where('keterangan', strtolower(request()->jenis))->firstOrFail();
-        // $status_kategori = StatusKategori::all();
+        $selected_kategori = StatusKategori::where('keterangan', strtolower($request->jenis))->firstOrFail();
         $mitra = Mitra::all();
 
         return view('kategori.edit', compact('selected_kategori', 'data', 'mitra'));
@@ -142,18 +150,25 @@ class KategoriController extends Controller
     {
         $this->validate($request, [
             'name' => 'required',
-            'harga' => 'required|numeric',
+            'harga' => 'numeric',
             'mitra_id' => 'required|exists:mitras,id',
-            'image' => 'file|image|mimes:jpg,png,jpeg'
+            'image' => 'file|image|mimes:jpg,png,jpeg',
+            'type' => 'required|in:TERSEDIA,CUSTOM,COMBO'
         ]);
 
-        $status_kategori = StatusKategori::where('keterangan', strtolower(request()->jenis))->firstOrFail();
+        if (empty($request->harga))
+        {
+            $request->harga = 0;
+        }
+
+        $status_kategori = StatusKategori::where('keterangan', strtolower($request->jenis))->firstOrFail();
 
         $data = Kategori::findOrFail($id);
         $data->name = $request->name;
         $data->harga = $request->harga;
         $data->status_kategori_id = $status_kategori->id;
         $data->mitra_id = $request->mitra_id;
+        $data->type = $request->type;
 
         if ($request->hasFile('image') && $request->image->isValid())
         {
@@ -168,7 +183,9 @@ class KategoriController extends Controller
 
         $data->save();
 
-        return redirect()->route('kategori.index', request()->jenis)->with('status', 'Berhasil diedit');
+        return redirect()
+        ->route('kategori.index', $request->jenis)
+        ->with('status', 'Berhasil diedit');
     }
 
     /**
@@ -177,11 +194,11 @@ class KategoriController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy($jenis, $id)
     {
         $data = Kategori::findOrFail($id);
 
-        return redirect()->route('kategori.index', request()->jenis)
+        return back()
         ->with('status', $data->delete() ? 'Berhasil dihapus' : 'Gagal dihapus');
     }
 }

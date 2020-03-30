@@ -17,6 +17,8 @@ class CreateDataPemesanansTable extends Migration
             $table->bigIncrements('id');
             $table->bigInteger('pemesanan_id')->unsigned();
             $table->bigInteger('kategori_id')->unsigned();
+            $table->bigInteger('data_kategori_id')->unsigned()->nullable();
+            $table->integer('qty')->nullable();
             $table->timestamps();
         });
     }

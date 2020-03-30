@@ -23,10 +23,19 @@ Route::middleware(['auth:web', 'user.access:admin'])->group(function() {
 	Route::prefix('/kategori/{jenis}')->name('kategori')->group(function() {
 		Route::get('/create', 'KategoriController@create')->name('.create');
 		Route::get('/', 'KategoriController@index')->middleware('filter.request:Kategori')->name('.index');
-		Route::get('/{id}', 'KategoriController@edit')->name('.edit');
+		Route::get('/edit/{id}', 'KategoriController@edit')->name('.edit');
 		Route::post('/', 'KategoriController@store')->name('.store');
 		Route::put('/{id}', 'KategoriController@update')->name('.update');
 		Route::delete('/{id}', 'KategoriController@destroy')->name('.destroy');
+
+		Route::prefix('/data/{kategori}')->name('.data')->group(function() {
+			Route::get('/create/', 'DataKategoriController@create')->name('.create');
+			Route::get('/', 'DataKategoriController@index')->middleware('filter.request:DataKategori')->name('.index');
+			Route::get('/edit/{id}', 'DataKategoriController@edit')->name('.edit');
+			Route::post('/', 'DataKategoriController@store')->name('.store');
+			Route::put('/{id}', 'DataKategoriController@update')->name('.update');
+			Route::delete('/{id}', 'DataKategoriController@destroy')->name('.destroy');
+		});
 	});
 
 	Route::middleware('filter.request:Paket')->resource('paket', 'PaketController');

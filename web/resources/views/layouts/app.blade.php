@@ -94,6 +94,9 @@
                                 <a class="nav-link" href="{{ route('paket.index') }}">Paket</a>
                             </li>
                             <li class="nav-item">
+                                <a class="nav-link" href="{{ route('mitra.index') }}">Mitra</a>
+                            </li>
+                            <li class="nav-item">
                                 <a class="nav-link" href="{{ route('iklan.index') }}">Iklan</a>
                             </li>
                         @endauth

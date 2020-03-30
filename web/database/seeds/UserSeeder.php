@@ -15,20 +15,33 @@ class UserSeeder extends Seeder
      */
     public function run()
     {
-        $status_user = StatusUser::create([
+        $status_admin = StatusUser::create([
     		'keterangan' => 'admin'
     	]);
         $status_user = StatusUser::create([
             'keterangan' => 'user'
         ]);
 
-        $user = User::create([
-        	'name' => 'DAADasdsd',
-        	'telp' => '123123123123',
+        User::create([
+        	'name' => 'Kosim',
+        	'telp' => '08697332332',
         	'username' => 'admin',
         	'password' => Hash::make('admin'),
-        	'alamat' => 'dsadsaadssdasdasad',
-        	'status_user_id' => $status_user->id
+            'alamat' => 'Kota Sukabumi',
+            'gender' => 'L',
+            'dob' => '2000-01-01',
+        	'status_user_id' => $status_admin->id
+        ]);
+
+        User::create([
+            'name' => 'Budi Irawan',
+            'telp' => '086687756552',
+            'username' => 'user',
+            'password' => Hash::make('admin'),
+            'alamat' => 'Kota Sukabumi',
+            'gender' => 'L',
+            'dob' => '1999-01-01',
+            'status_user_id' => $status_user->id
         ]);
     }
 }

@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class Kategori extends Model
 {
     protected $fillable = [
-    	'image_id', 'mitra_id', 'status_kategori_id', 'name', 'harga'
+    	'image_id', 'mitra_id', 'status_kategori_id', 'name', 'harga', 'type'
     ];
     
     protected $with = ['image', 'status'];
@@ -24,6 +24,11 @@ class Kategori extends Model
 
     public function status()
     {
-    	return $this->belongsTo(StatusKategori::class, 'status_kategori_id');
+    	return $this->belongsTo(StatusKategori::class);
+    }
+
+    public function data()
+    {
+        return $this->hasMany(DataKategori::class);
     }
 }
