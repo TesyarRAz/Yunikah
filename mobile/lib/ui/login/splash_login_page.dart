@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:yunikah/constant/routes.dart';
+import 'package:yunikah/model/user.dart';
 import 'package:yunikah/provider/auth_provider.dart';
 import 'package:yunikah/ui/login/login_page.dart';
 import 'package:yunikah/ui/register/register_page.dart';
@@ -28,14 +31,18 @@ class SplashLoginPage extends StatelessWidget {
               textColor: Colors.white,
               child: Text('Login'),
               onPressed: () {
-                Navigator.of(context).push(
-                  MaterialPageRoute(
-                    builder: (_) => LoginPage()
-                  )
-                )
-                .then((user) {
+                Navigator.of(context).pushNamed(ROUTE_LOGIN)
+                .then((_user) {
+                  User user = _user as User;
                   if (user != null) {
-                    Provider.of<AuthProvider>(context).value = user;
+                    SharedPreferences.getInstance().then((pref) {
+                      pref.setString("username", user.username);
+                      pref.setString("password", user.password);
+                      pref.setString("name", user.name);
+                      pref.setString("token", user.token);
+                      
+                      Provider.of<AuthProvider>(context).value = user;
+                    });
                   }
                 });
               },
@@ -56,14 +63,19 @@ class SplashLoginPage extends StatelessWidget {
                     ),
                   ),
                   onTap: () {
-                    Navigator.of(context).push(
-                      MaterialPageRoute(
-                        builder: (_) => RegisterPage()
-                      )
-                    )
-                    .then((user) {
+                    Navigator.of(context).pushNamed(ROUTE_REGISTER)
+                    .then((_user) {
+                      User user = _user as User;
+
                       if (user != null) {
-                        Provider.of<AuthProvider>(context).value = user;
+                        SharedPreferences.getInstance().then((pref) {
+                          pref.setString("username", user.username);
+                          pref.setString("password", user.password);
+                          pref.setString("name", user.name);
+                          pref.setString("token", user.token);
+                          
+                          Provider.of<AuthProvider>(context).value = user;
+                        });
                       }
                     });
                   },

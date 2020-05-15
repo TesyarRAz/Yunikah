@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import 'package:yunikah/helper.dart';
-import 'package:yunikah/model/user.dart';
 import 'package:yunikah/network.dart';
-import 'package:yunikah/provider/auth_provider.dart';
 
 class LoginPage extends StatefulWidget {
   final _formLoginState = GlobalKey<FormState>();

@@ -72,6 +72,7 @@ class _MenuPageState extends State<MenuPage> {
     return BottomNavigationBar(
       currentIndex: index,
       onTap: (int nIndex) {
+        if (index == nIndex) return;
         setState(() {
           index = nIndex;
         });

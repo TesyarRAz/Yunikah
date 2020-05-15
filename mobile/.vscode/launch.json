@@ -5,8 +5,15 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Flutter",
+            "name": "Release",
             "request": "launch",
+            "flutterMode": "release",
+            "type": "dart"
+        },
+        {
+            "name": "Debug",
+            "request": "launch",
+            "flutterMode": "debug",
             "type": "dart"
         }
     ]

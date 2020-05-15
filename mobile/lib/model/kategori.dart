@@ -1,4 +1,5 @@
 import 'package:yunikah/model/asset.dart';
+import 'package:yunikah/model/mitra.dart';
 
 class StatusKategori {
   int id;
@@ -21,23 +22,53 @@ enum KategoriType {
   COMBO
 }
 
+class DataKategori {
+  int id;
+  String name;
+
+  int harga;
+
+  DataKategori({this.id, this.name, this.harga});
+
+  factory DataKategori.parseFromJson(Map<String, dynamic> map) => DataKategori(
+    id: map['id'],
+    name: map['name'],
+    harga: map['harga']
+  );
+}
+
 class Kategori {
   int id;
   int harga;
   String name;
+  String keterangan;
 
+  Mitra mitra;
   Asset image;
   KategoriType type;
   StatusKategori status;
+  List<DataKategori> data;
 
-  Kategori({this.id, this.harga, this.name, this.image, this.type, this.status});
+  Kategori({
+    this.id, 
+    this.harga, 
+    this.name, 
+    this.keterangan, 
+    this.mitra,
+    this.image, 
+    this.type, 
+    this.status, 
+    this.data
+  });
 
   factory Kategori.parseFromJson(Map<String, dynamic> map) => Kategori(
     id: map['id'],
     harga: map['harga'],
     name: map['name'],
+    keterangan: map['keterangan'],
     image: Asset.parseFromJson(map['image']),
-    type: KategoriType.values.singleWhere((type) => type.toString() == map['kategori'])
+    type: KategoriType.values.singleWhere((type) => type.toString() == map['kategori']),
+    data: List.from(map['data']).map((json) => DataKategori.parseFromJson(json)).toList()
   );
 }
 
