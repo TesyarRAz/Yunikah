@@ -4,7 +4,7 @@
 <div class="container h-100">
     <div class="row align-items-center h-100">
         <div class="col-md-5 col-12 mx-auto">
-            <div class="container">
+            <div class="card p-3">
                 <h2 align="center">Tambah Iklan</h2>
 
                 <form enctype="multipart/form-data" class="form-group my-5" action="{{ route('iklan.store') }}" method="POST">

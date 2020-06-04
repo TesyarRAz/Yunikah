@@ -4,17 +4,17 @@
 <div class="container h-100">
     <div class="row align-items-center h-100">
         <div class="col-md-5 col-12 mx-auto">
-            <div class="container">
-                <h2 align="center">Edit Data Mitra</h2>
+            <div class="card p-3">
+                <h2 align="center">Edit Iklan</h2>
 
-                <form enctype="multipart/form-data" class="form-group my-5" action="{{ route('mitra.update', $data->id) }}" method="POST">
+                <form enctype="multipart/form-data" class="form-group my-5" action="{{ route('iklan.update', $iklan->id) }}" method="POST">
                     @csrf
                     @method('PUT')
                     <div class="form-group row">
                         <label for="name" class="col-md-4 col-form-label text-md-right">{{ __('Name') }}</label>
 
                         <div class="col-md-6">
-                            <input id="name" type="text" class="form-control @error('name') is-invalid @enderror" name="name" value="{{ old('name') ?? $data->name }}" required autocomplete="name" autofocus>
+                            <input id="name" type="text" class="form-control @error('name') is-invalid @enderror" name="name" value="{{ old('name') ?? $iklan->name }}" required autocomplete="name" autofocus>
 
                             @error('name')
                                 <span class="invalid-feedback" role="alert">
@@ -41,7 +41,7 @@
                         <label for="keterangan" class="col-md-4 col-form-label text-md-right">{{ __('Keterangan') }}</label>
 
                         <div class="col-md-6">
-                            <textarea id="keterangan" type="text" class="form-control @error('keterangan') is-invalid @enderror" name="keterangan" required autocomplete="keterangan" autofocus>{{ old('keterangan') ?? $data->keterangan }}</textarea>
+                            <textarea id="keterangan" type="text" class="form-control @error('keterangan') is-invalid @enderror" name="keterangan" required autocomplete="keterangan" autofocus>{{ old('keterangan') ?? $iklan->keterangan }}</textarea>
 
                             @error('keterangan')
                                 <span class="invalid-feedback" role="alert">

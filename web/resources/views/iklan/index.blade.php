@@ -27,7 +27,7 @@
                             <td>{{ $i }}</td>
                             <td>{{ $d->name }}</td>
                             <td>
-                                <a class="btn btn-success" href="#" @if(!empty($d->image)) onclick="showModal('{{ asset('uploads/images/' . $d->image->name)}}')" @endif>Buka</a>
+                                <a class="btn btn-success" href="#" @if(!empty($d->image)) onclick="showModal('{{ asset('assets/images/' . $d->image->name)}}')" @endif>Buka</a>
                             </td>
                             <td>
                                 <a class="btn btn-danger" href="{{ route('iklan.edit', $d->id) }}">Edit</a>
@@ -43,6 +43,8 @@
                     @endforeach
         		</tbody>
         	</table>
+
+            {{ $data->render() }}
 
             <a class="btn btn-primary" href="{{ route('iklan.create') }}">
                 Tambah Data Baru

@@ -1,39 +1,41 @@
-@extends('layouts.app')
+<!DOCTYPE html>
+<html class="h-100">
+<head>
+	<title>{{ config('app.name') }}</title>
+	<link rel="stylesheet" type="text/css" href="{{ asset('assets/bootstrap/css/bootstrap.min.css') }}">
+</head>
+<body class="h-100">
+<div class="container-fluid h-100">
+	<div class="d-flex justify-content-center align-items-center h-100">
+		<form action="{{ route('login.post') }}" method="post" class="form-group">
+			<h2 class="text-center">Login Yunikah</h2>
+			@csrf
 
-@section('content')
-<div class="container h-100">
-    <div class="row align-items-center h-100">
-        <div class="col-md-5 col-12 mx-auto">
-            <div class="card p-5">
-                <h2 align="center">Login Yunikah</h2>
-                @if (Session::has('status'))
-                    <div class="alert alert-warning">
-                        {{ Session::get('status') }}
-                    </div>
-                @endif
+			<div class="border p-5 rounded">
+				<input type="text" name="username" placeholder="Username" class="form-control my-2" required>
+				@error('username')
+                    <span class="invalid-feedback" role="alert">
+                        <strong>{{ $message }}</strong>
+                    </span>
+                @enderror
+				<input type="password" name="password" placeholder="Password" class="form-control my-2" required>
+				@error('password')
+                    <span class="invalid-feedback" role="alert">
+                        <strong>{{ $message }}</strong>
+                    </span>
+                @enderror
 
-                <form class="form-group my-3" action="{{ route('login') }}" method="POST">
-                    @csrf
-                    <div class="form-group">
-                        <input class="form-control my-2 @error('username') is-invalid @enderror" type="text" name="username" placeholder="Username" value="{{ old('username') }}"  required autocomplete="username" autofocus>
-                        @error('username')
-                            <span class="invalid-feedback" role="alert">
-                                <strong>{{ $message }}</strong>
-                            </span>
-                        @enderror
-                    </div>
-                    <div class="form-group">
-                        <input class="form-control my-2 @error('password') is-invalid @enderror" type="password" name="password" placeholder="Password"  required autocomplete="current-password">
-                        @error('password')
-                            <span class="invalid-feedback" role="alert">
-                                <strong>{{ $message }}</strong>
-                            </span>
-                        @enderror
-                    </div>
-                    <input class="btn btn-success w-100" type="submit" value="Login">
-                </form>
-            </div>
-        </div>
-    </div>
+				@error('login')
+                    <span class="invalid-feedback" role="alert">
+                        <strong>{{ $message }}</strong>
+                    </span>
+                @enderror
+				<button type="submit" class="btn btn-success">Login</button>
+			</div>
+		</form>
+	</div>
 </div>
-@endsection
+<script type="text/javascript" src="{{ asset('assets/js/jquery.js') }}"></script>
+<script type="text/javascript" src="{{ asset('assets/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
+</body>
+</html>

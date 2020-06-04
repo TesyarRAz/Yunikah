@@ -17,17 +17,20 @@
         				<th>#</th>
         				<th>Nama</th>
                         <th>Gambar</th>
-                        <th colspan="2">Opsi</th>
+                        <th colspan="3">Opsi</th>
         			</tr>
         		</thead>
         		<tbody class="bg-white">
                     @php $i = 1; @endphp
         			@foreach ($data as $d)
                         <tr>
-                            <td>{{ $i }}</td>
+                            <td>{{ $i++ }}</td>
                             <td>{{ $d->name }}</td>
                             <td>
-                                <a class="btn btn-success" href="#" @if(!empty($d->image)) onclick="showModal('{{ asset('uploads/images/' . $d->image->name)}}')" @endif>Buka</a>
+                                <button class="btn btn-success" @if(!empty($d->image)) onclick="showModal('{{ asset('assets/images/' . $d->image->name)}}')" @endif>Buka</button>
+                            </td>
+                            <td>
+                                <a class="btn btn-secondary" href="{{ route('produk.index', $d->id) }}">Kelola Produk</a>
                             </td>
                             <td>
                                 <a class="btn btn-danger" href="{{ route('mitra.edit', $d->id) }}">Edit</a>
@@ -43,6 +46,8 @@
                     @endforeach
         		</tbody>
         	</table>
+
+            {{ $data->render() }}
 
             <a class="btn btn-primary" href="{{ route('mitra.create') }}">
                 Tambah Data Baru

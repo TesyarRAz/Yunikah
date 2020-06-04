@@ -25,11 +25,14 @@
                     @php $i = 1; @endphp
         			@foreach ($data as $d)
                         <tr>
-                            <td>{{ $i }}</td>
+                            <td>{{ $i++ }}</td>
                             <td>{{ $d->name }}</td>
                             <td>Rp. {{ number_format($d->harga, 2, ',', '.') }}</td>
                             <td>
-                                <a class="btn btn-success" href="#" @if(!empty($d->image)) onclick="showModal('{{ asset('uploads/images/' . $d->image->name)}}')" @endif>Buka</a>
+                                <a class="btn btn-success" href="#" @if(!empty($d->image)) onclick="showModal('{{ asset('assets/images/' . $d->image->name)}}')" @endif>Buka</a>
+                            </td>
+                            <td>
+                                <a class="btn btn-secondary" href="{{ route('paket.detail.index', $d->id) }}">Detail Paket</a>
                             </td>
                             <td>
                                 <a class="btn btn-danger" href="{{ route('paket.edit', $d->id) }}">Edit</a>
@@ -40,9 +43,6 @@
                                     @method('DELETE')
                                     <button class="btn btn-warning">Hapus</button>
                                 </form>
-                            </td>
-                            <td>
-                                <a class="btn btn-secondary" href="{{ route('paket.data.index', $d->id) }}">Detail Paket</a>
                             </td>
                         </tr>
                     @endforeach

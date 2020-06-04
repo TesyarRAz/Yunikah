@@ -9,15 +9,12 @@
 
     <title>{{ config('app.name', 'Laravel') }}</title>
 
-    <!-- Scripts -->
-    <script src="{{ asset('js/app.js') }}" defer></script>
-
     <!-- Fonts -->
     <link rel="dns-prefetch" href="//fonts.gstatic.com">
     <link href="https://fonts.googleapis.com/css?family=Nunito" rel="stylesheet">
 
     <!-- Styles -->
-    <link href="{{ asset('css/app.css') }}" rel="stylesheet">
+    <link href="{{ asset('assets/bootstrap/css/bootstrap.min.css') }}" rel="stylesheet">
 </head>
 <body>
     <!-- For Modallll -->
@@ -39,7 +36,7 @@
         </div>
       </div>
     </div>
-
+    @yield('modal')
     <div class="h-100">
         <nav class="navbar navbar-expand-md navbar-light bg-white shadow-sm">
             <div class="container">
@@ -54,53 +51,27 @@
                     <!-- Left Side Of Navbar -->
                     <ul class="navbar-nav mr-auto">
                         @auth
+                            <li class="nav-item">
+                                <a class="nav-link" href="{{ route('dashboard') }}">Dashboard</a>
+                            </li>
                             <li class="nav-item dropdown">
                                 <a id="pemesananDropdown" class="nav-link dropdown-toggle" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>Pemesanan</a>
                                 <div class="dropdown-menu" aria-labelledby="pemesananDropdown">
-                                    @php
-                                    $all_st_pemesanan = \App\Model\StatusPemesanan::all();
-                                    @endphp
-                                    @foreach ($all_st_pemesanan as $st)
-                                        @if ($st->keterangan != 'keranjang')
-                                            <a class="dropdown-item" href="{{
-                                                route('home', $st->keterangan)
-                                            }}">
-                                                {{ ucfirst($st->keterangan) }}
-                                            </a>
-                                        @endif
-                                    @endforeach
+                                    <a class="dropdown-item" href="{{ route('pemesanan.index.produk') }}">Produk</a>
+                                    <a class="dropdown-item" href="{{ route('pemesanan.index.paket') }}">Paket</a>
                                 </div>
-                            </li>
-                            <li class="nav-item dropdown">
-                                <a id="kategoriDropdown" class="nav-link dropdown-toggle" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>Kategori</a>
-                                <div class="dropdown-menu" aria-labelledby="kategoriDropdown">
-                                    @php
-                                    $all_kategori = \App\Model\StatusKategori::all();
-                                    @endphp
-                                    @foreach ($all_kategori as $kategori)
-                                        <a class="dropdown-item" href="{{
-                                            route('kategori.index', $kategori->keterangan)
-                                        }}">
-                                            @if ($kategori->keterangan == 'alat')
-                                                Alat Pesta
-                                            @else
-                                                {{ ucfirst($kategori->keterangan) }}
-                                            @endif
-                                        </a>
-                                    @endforeach
-                                </div>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" href="{{ route('paket.index') }}">Paket</a>
                             </li>
                             <li class="nav-item">
                                 <a class="nav-link" href="{{ route('mitra.index') }}">Mitra</a>
                             </li>
                             <li class="nav-item">
+                                <a class="nav-link" href="{{ route('paket.index') }}">Paket</a>
+                            </li>
+                            <li class="nav-item">
                                 <a class="nav-link" href="{{ route('iklan.index') }}">Iklan</a>
                             </li>
                             <li class="nav-item">
-                            	<a class="nav-link" href="{{ route('mitra.index') }}">Mitra</a>
+                                <a class="nav-link" href="{{ route('apitest') }}">ApiTest</a>
                             </li>
                         @endauth
                     </ul>
@@ -108,35 +79,23 @@
                     <!-- Right Side Of Navbar -->
                     <ul class="navbar-nav ml-auto">
                         <!-- Authentication Links -->
-                        @guest
-                            <li class="nav-item">
-                                <a class="nav-link" href="{{ route('login') }}">{{ __('Login') }}</a>
-                            </li>
-                            @if (Route::has('register'))
-                                <li class="nav-item">
-                                    <a class="nav-link" href="{{ route('register') }}">{{ __('Register') }}</a>
-                                </li>
-                            @endif
-                        @else
-                            <li class="nav-item dropdown">
-                                <a id="navbarDropdown" class="nav-link dropdown-toggle" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>
-                                    {{ Auth::user()->name }} <span class="caret"></span>
+                        <li class="nav-item dropdown">
+                            <a id="navbarDropdown" class="nav-link dropdown-toggle" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>
+                                {{ auth()->user()->name }} <span class="caret"></span>
+                            </a>
+                            <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdown">
+                                <a class="dropdown-item" href="{{ route('user.changepassword') }}">Change Password</a>
+                                <a class="dropdown-item" href="{{ route('logout') }}"
+                                   onclick="event.preventDefault();
+                                                 document.getElementById('logout-form').submit();">
+                                    {{ __('Logout') }}
                                 </a>
 
-                                <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdown">
-                                    <a class="dropdown-item" href="{{ route('password.reset') }}">{{ __('Reset Password') }}</a>
-                                    <a class="dropdown-item" href="{{ route('logout') }}"
-                                       onclick="event.preventDefault();
-                                                     document.getElementById('logout-form').submit();">
-                                        {{ __('Logout') }}
-                                    </a>
-
-                                    <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
-                                        @csrf
-                                    </form>
-                                </div>
-                            </li>
-                        @endguest
+                                <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
+                                    @csrf
+                                </form>
+                            </div>
+                        </li>
                     </ul>
                 </div>
             </div>
@@ -146,6 +105,10 @@
             @yield('content')
         </main>
     </div>
-    <script type="text/javascript" src="{{ asset('js/modal.js') }}"></script>
+
+    <!-- Scripts -->
+    <script type="text/javascript" src="{{ asset('assets/js/jquery.js') }}"></script>
+    <script type="text/javascript" src="{{ asset('assets/bootstrap/js/bootstrap.bundle.js') }}"></script>
+    <script type="text/javascript" src="{{ asset('assets/js/modal.js') }}"></script>
 </body>
 </html>
