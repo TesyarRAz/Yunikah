@@ -58,17 +58,8 @@
             method: method.value
         }
 
-        if (input.method.toLowerCase() != 'get')
-        {
-            input.header = {
-                '_token' : await fetch('http://localhost:8000/sanctum/csrf-cookie')
-            }
-        }
-
         if (data.value.length > 0) input.data = data.value;
         if (token.value.length > 0) input.header['Authorization'] = 'Bearer ' + token.value;
-
-        console.log(input);
 
         await fetch(link.value, input)
         .then(e => e.text())

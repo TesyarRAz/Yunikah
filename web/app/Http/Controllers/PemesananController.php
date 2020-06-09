@@ -39,7 +39,7 @@ class PemesananController extends Controller
     	$pemesanan->status_pemesanan_id = $status->id;
     	$pemesanan->save();
 
-    	return redirect()->route('pemesanan.index', $status->name);
+    	return redirect()->route('pemesanan.index.produk', $status->name);
     }
 
     public function post_paket(StatusPemesanan $status, PemesananPaket $pemesanan)
@@ -47,7 +47,7 @@ class PemesananController extends Controller
     	$pemesanan->status_pemesanan_id = $status->id;
     	$pemesanan->save();
 
-    	return redirect()->route('pemesanan.index', $status->name);
+    	return redirect()->route('pemesanan.index.paket', $status->name);
     }
 
     public function destroy_produk(PemesananProduk $pemesanan)

@@ -18,10 +18,10 @@ Route::name('login.post')->post('/login', 'UserController@post');
 
 Route::middleware('auth')->group(function() {
 	Route::name('home')->get('/', 'HomeController@index');
-	Route::name('logout')->get('/logout', 'UserController@logout');
+	Route::name('logout')->post('/logout', 'UserController@logout');
 	Route::name('user.changepassword')->get('/changepassword', 'UserController@change_password_view');
 	Route::name('user.changepassword.post')->post('/changepassword/post', 'UserController@change_password_post');
-	Route::name('apitest')->get('/', function() {
+	Route::name('apitest')->get('/apitest', function() {
 		return view('apitest');
 	});
 
