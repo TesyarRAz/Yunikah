@@ -6,24 +6,10 @@ use Illuminate\Database\Eloquent\Model;
 
 class Kategori extends Model
 {
-    protected $fillable = [
-    	'image_id', 'mitra_id', 'status_kategori_id', 'name', 'harga'
-    ];
-    
-    protected $with = ['image', 'status'];
+    protected $guarded = ['id'];
 
-    public function image()
+    public function produks()
     {
-        return $this->belongsTo(Asset::class, 'image_id');
-    }
-
-    public function mitra()
-    {
-    	return $this->belongsTo(Mitra::class);
-    }
-
-    public function status()
-    {
-    	return $this->belongsTo(StatusKategori::class, 'status_kategori_id');
+        return $this->hasMany('App\Model\Produk');
     }
 }

@@ -6,15 +6,11 @@ use Illuminate\Database\Eloquent\Model;
 
 class Asset extends Model
 {
-    protected $fillable = [
-    	'name', 'type'
-    ];
-    protected $appends = [
-    	'image_link'
-    ];
+    protected $guarded = ['id'];
+    protected $appends = ['link'];
 
-    public function getImageLinkAttribute()
+    public function getLinkAttribute()
     {
-    	return asset('uploads/images') . '/' . $this->name;
+    	return asset('assets/images/' . $this->name);
     }
 }

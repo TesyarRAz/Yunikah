@@ -6,12 +6,15 @@ use Illuminate\Database\Eloquent\Model;
 
 class Mitra extends Model
 {
-    protected $fillable = [
-    	'image_id', 'name'
-    ];
+    protected $guarded = ['id'];
+
+    public function produks()
+    {
+    	return $this->hasMany('App\Model\Produk');
+    }
 
     public function image()
-	{
-		return $this->belongsTo(Asset::class, 'image_id');
-	}
+    {
+    	return $this->belongsTo('App\Model\Asset', 'image_id');
+    }
 }

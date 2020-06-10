@@ -6,17 +6,16 @@ use Illuminate\Database\Eloquent\Model;
 
 class Paket extends Model
 {
-    protected $fillable = [
-    	'image_id', 'name', 'harga'
-	];
+    protected $guarded = ['id'];
+    protected $with = ['image'];
 
-	public function data()
-	{
-		return $this->hasMany(DataPaket::class, 'paket_id');
-	}
+    public function image()
+    {
+        return $this->belongsTo('App\Model\Asset', 'image_id');
+    }
 
-	public function image()
-	{
-		return $this->belongsTo(Asset::class, 'image_id');
-	}
+    public function details()
+    {
+    	return $this->hasMany('App\Model\DetailPaket');
+    }
 }

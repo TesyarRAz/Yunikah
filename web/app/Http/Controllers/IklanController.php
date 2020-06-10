@@ -4,13 +4,10 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 
-use App\Model\Iklan;
-use App\Model\StatusKategori;
-use App\Model\Asset;
+use App\Http\Requests\IklanRequest;
 
-use DB;
-use File;
-use Str;
+use App\Model\Iklan;
+use App\Model\Asset;
 
 class IklanController extends Controller
 {
@@ -21,12 +18,7 @@ class IklanController extends Controller
      */
     public function index()
     {
-        $data = request()->filterQuery->with('image')->get();
-
-        if (request()->routeIs('api'))
-        {
-            return response($data, 200);
-        }
+        $data = Iklan::paginate(10);
 
         return view('iklan.index', compact('data'));
     }
@@ -47,35 +39,16 @@ class IklanController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(IklanRequest $request)
     {
-        $this->validate($request, [
-            'name' => 'required',
-            'image' => 'required|file|image|mimes:jpg,png,jpeg'
-        ]);
+        $iklan = new Iklan;
+        $iklan->fill($request->only(['name', 'keterangan']));
 
-        $data = new Iklan;
-        $data->name = $request->name;
+        $this->fillAssetImage($iklan);
 
-        if ($request->hasFile('image') && $request->image->isValid())
-        {
-            $asset = Asset::create([
-                'name' => Str::random(50) . '.' . $request->image->getClientOriginalExtension(),
-                'type' => 'image'
-            ]);
+        $iklan->save();
 
-            $data->image_id = $asset->id;
-            $request->image->move(public_path('uploads/images'), $asset->name);
-        }
-
-        if ($request->filled('keterangan'))
-        {
-            $data->keterangan = $request->keterangan;
-        }
-
-        $data->save();
-
-        return redirect()->route('iklan.index')->with('status', 'Berhasil ditambahkan');
+        return redirect()->route('iklan.index')->with('status', 'Berhasil menambah iklan');
     }
 
     /**
@@ -86,12 +59,7 @@ class IklanController extends Controller
      */
     public function show($id)
     {
-        $data = Iklan::with('image')->find($id);
-
-        if (request()->routeIs('api'))
-        {
-            return response($data, 200);
-        }
+        
     }
 
     /**
@@ -100,12 +68,9 @@ class IklanController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function edit($id)
+    public function edit(Iklan $iklan)
     {
-        $data = Iklan::findOrFail($id);
-        $status_kategori = StatusKategori::all();
-
-        return view('iklan.edit', compact('status_kategori', 'data'));
+        return view('iklan.edit', compact('iklan'));
     }
 
     /**
@@ -115,34 +80,15 @@ class IklanController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(IklanRequest $request, Iklan $iklan)
     {
-        $this->validate($request, [
-            'name' => 'required',
-            'image' => 'file|image|mimes:jpg,png,jpeg'
-        ]);
+        $iklan->fill($request->only(['name', 'keterangan']));
 
-        $data = Iklan::findOrFail($id);
-        $data->name = $request->name;
-        if ($request->hasFile('image') && $request->image->isValid())
-        {
-            $asset = Asset::create([
-                'name' => Str::random(50) . '.' . $request->image->getClientOriginalExtension(),
-                'type' => 'image'
-            ]);
+        $this->fillAssetImage($iklan);
 
-            $data->image_id = $asset->id;
-            $request->image->move(public_path('uploads/images'), $asset->name);
-        }
+        $iklan->save();
 
-        if ($request->filled('keterangan'))
-        {
-            $data->keterangan = $request->keterangan;
-        }
-
-        $data->save();
-
-        return redirect()->route('iklan.index')->with('status', 'Berhasil diedit');
+        return redirect()->route('iklan.index')->with('status', 'Berhasil mengedit iklan');
     }
 
     /**
@@ -151,11 +97,24 @@ class IklanController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy(Iklan $iklan)
     {
-        $data = Iklan::findOrFail($id);
+        $iklan->delete();
 
-        return redirect()->route('iklan.index')
-        ->with('status', $data->delete() ? 'Berhasil dihapus' : 'Gagal dihapus');
+        return redirect()->route('iklan.index')->with('status', 'Berhasil menghapus iklan');
+    }
+
+    private function fillAssetImage($model)
+    {
+        if (request()->hasFile('image') && request()->image->isValid())
+        {
+            $asset = Asset::create([
+                'name' => Str::random(50) . '.' . request()->image->getClientOriginalExtension(),
+                'type' => 'image'
+            ]);
+
+            $model->image_id = $asset->id;
+            request()->image->move(public_path('assets/images'), $asset->name);
+        }
     }
 }

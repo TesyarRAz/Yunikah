@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Route;
 
 /*
 |--------------------------------------------------------------------------
@@ -13,57 +14,37 @@ use Illuminate\Http\Request;
 |
 */
 
-Route::prefix('auth')->group(function() {
-	Route::post('/login', 'UserController@login');
-	Route::post('/register', 'UserController@register');
-	
-	Route::middleware('auth:api')->group(function() {
-		Route::put('/user/update', 'UserController@updateData');
-		Route::post('/auth/logout', 'UserController@logout');
+Route::namespace('Api')->group(function() {
+	Route::prefix('/auth')->group(function() {
+		Route::post('/login', 'UserController@post');
+		Route::get('/user', 'UserController@index');
 	});
 
-});
-
-Route::namespace('\App\Http\Controllers')->name('api')->group(function() {
-
-	Route::prefix('/kategori/{jenis}')->group(function() {
-		Route::get('/', 'KategoriController@index')->middleware('filter.request:Kategori');
-		Route::get('/{id}', 'KategoriController@show');
-
-		Route::middleware('auth:api')->get('/{id}/pesan', 'Api\PemesananController@pesan_satuan');
-	});
-
-	Route::prefix('/mitra')->group(function() {
-		Route::get('/', 'MitraController@index')->middleware('filter.request:Mitra');
-		Route::get('/{id}', 'MitraController@show');
-	});
-
-	Route::prefix('/paket')->group(function() {
-		Route::get('/', 'PaketController@index')->middleware('filter.request:Paket');
-		Route::get('/{paket}', 'PaketController@show');
-		Route::get('/{paket}/data', 'DataPaketController@index')->middleware('filter.request:DataPaket');
-		Route::get('/{paket}/data/{id}', 'DataPaketController@show');
-
-		Route::middleware('auth:api')->get('/{paket}/pesan', 'Api\PemesananController@pesan_paket');
-	});
-
-	Route::middleware('auth:api')->prefix('/pemesanan')->group(function() {
-		Route::get('/', 'Api\PemesananController@index')->middleware('filter.request:Pemesanan');
-		Route::get('/{id_pemesanan}', 'Api\PemesananController@show');
-		Route::delete('/hapus/{id_pemesanan}', 'Api\PemesananController@hapus_pemesanan');
-		Route::delete('/hapus/satuan/{id_data_pemesanan}', 'Api\PemesananController@hapus_satuan');
-
-		Route::post('/checkout', 'Api\PemesananController@checkout');
+	Route::prefix('/produk/{kategori:name}/')->group(function() {
+		Route::get('/', 'ProdukController@index');
+		Route::get('/{produk:id}', 'ProdukController@show');
 	});
 
 	Route::prefix('/iklan')->group(function() {
-		Route::get('/', 'IklanController@index')->middleware('filter.request:Iklan');
+		Route::get('/', 'IklanController@index');
 		Route::get('/{id}', 'IklanController@show');
 	});
 
-	Route::get('/status/kategori', function() {
-		$status = \App\Model\StatusKategori::all();
+	Route::prefix('/paket')->group(function() {
+		Route::get('/', 'PaketController@index');
+		Route::get('/{id}', 'PaketController@show');
+	});
 
-		return response($status, 200);
+	Route::prefix('/mitra')->group(function() {
+		Route::get('/', 'MitraController@index');
+		Route::get('/{id}', 'MitraController@show');
+	});
+
+	Route::prefix('/pemesanan')->middleware('auth')->group(function() {
+		Route::post('/produk/{produk}', 'PemesananController@produk');
+		Route::post('/paket/{paket}', 'PemesananController@paket');
+
+		Route::post('/produk/checkout/{produk}', 'PemesananController@checkout_produk');
+		Route::post('/paket/checkout/{paket}', 'PemesananController@checkout_paket');
 	});
 });

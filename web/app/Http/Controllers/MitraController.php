@@ -4,13 +4,9 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 
-use App\Model\Mitra;
-use App\Model\StatusKategori;
-use App\Model\Asset;
+use App\Http\Requests\MitraRequest;
 
-use DB;
-use File;
-use Str;
+use App\Model\Mitra;
 
 class MitraController extends Controller
 {
@@ -21,12 +17,7 @@ class MitraController extends Controller
      */
     public function index()
     {
-        $data = request()->filterQuery->with('image')->get();
-
-        if (request()->routeIs('api'))
-        {
-            return response($data, 200);
-        }
+        $data = Mitra::paginate(10);
 
         return view('mitra.index', compact('data'));
     }
@@ -47,30 +38,18 @@ class MitraController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(MitraRequest $request)
     {
-        $this->validate($request, [
-            'name' => 'required',
-            'image' => 'required|file|image|mimes:jpg,png,jpeg'
-        ]);
+        $mitra = new Mitra;
+        $mitra->fill($request->only(['name', 'alamat', 'keterangan']));
 
-        $data = new Mitra;
-        $data->name = $request->name;
+        $this->fillAssetImage($mitra);
 
-        if ($request->hasFile('image') && $request->image->isValid())
-        {
-            $asset = Asset::create([
-                'name' => Str::random(50) . '.' . $request->image->getClientOriginalExtension(),
-                'type' => 'image'
-            ]);
+        $mitra->save();
 
-            $data->image_id = $asset->id;
-            $request->image->move(public_path('uploads/images'), $asset->name);
-        }
-
-        $data->save();
-
-        return redirect()->route('mitra.index')->with('status', 'Berhasil ditambahkan');
+        return redirect()
+        ->route('mitra.index')
+        ->with('status', 'Berhasil ditambahkan');
     }
 
     /**
@@ -81,12 +60,7 @@ class MitraController extends Controller
      */
     public function show($id)
     {
-        $data = Mitra::with('image')->find($id);
-
-        if (request()->routeIs('api'))
-        {
-            return response($data, 200);
-        }
+        //
     }
 
     /**
@@ -95,12 +69,9 @@ class MitraController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function edit($id)
+    public function edit(Mitra $mitra)
     {
-        $data = Mitra::findOrFail($id);
-        $status_kategori = StatusKategori::all();
-
-        return view('mitra.edit', compact('status_kategori', 'data'));
+        return view('mitra.edit', ['data' => $mitra]);
     }
 
     /**
@@ -110,29 +81,17 @@ class MitraController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(MitraRequest $request, Mitra $mitra)
     {
-        $this->validate($request, [
-            'name' => 'required',
-            'image' => 'file|image|mimes:jpg,png,jpeg'
-        ]);
+        $mitra->fill($request->only(['name', 'alamat', 'keterangan']));
 
-        $data = Mitra::findOrFail($id);
-        $data->name = $request->name;
-        if ($request->hasFile('image') && $request->image->isValid())
-        {
-            $asset = Asset::create([
-                'name' => Str::random(50) . '.' . $request->image->getClientOriginalExtension(),
-                'type' => 'image'
-            ]);
+        $this->fillAssetImage($mitra);
 
-            $data->image_id = $asset->id;
-            $request->image->move(public_path('uploads/images'), $asset->name);
-        }
+        $mitra->save();
 
-        $data->save();
-
-        return redirect()->route('mitra.index')->with('status', 'Berhasil diedit');
+        return redirect()
+        ->route('mitra.index')
+        ->with('status', 'Berhasil diedit');
     }
 
     /**
@@ -141,11 +100,26 @@ class MitraController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy(Mitra $mitra)
     {
-        $data = Mitra::findOrFail($id);
+        $mitra->delete();
 
-        return redirect()->route('mitra.index')
-        ->with('status', $data->delete() ? 'Berhasil dihapus' : 'Gagal dihapus');
+        return redirect()
+        ->route('mitra.index')
+        ->with('status', 'Berhasil dihapus');
+    }
+
+    private function fillAssetImage($model)
+    {
+        if (request()->hasFile('image') && request()->image->isValid())
+        {
+            $asset = Asset::create([
+                'name' => Str::random(50) . '.' . request()->image->getClientOriginalExtension(),
+                'type' => 'image'
+            ]);
+
+            $model->image_id = $asset->id;
+            request()->image->move(public_path('assets/images'), $asset->name);
+        }
     }
 }

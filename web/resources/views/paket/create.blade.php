@@ -4,8 +4,8 @@
 <div class="container h-100">
     <div class="row align-items-center h-100">
         <div class="col-md-5 col-12 mx-auto">
-            <div class="container">
-                <h2 align="center">Tambah Data Paket</h2>
+            <div class="card p-3">
+                <h2 align="center">Tambah Paket</h2>
 
                 <form enctype="multipart/form-data" class="form-group my-5" action="{{ route('paket.store') }}" method="POST">
                     @csrf
@@ -43,6 +43,20 @@
                             <input id="image" type="file" class="@error('image') is-invalid @enderror" name="image" accept="image/*">
 
                             @error('image')
+                                <span class="invalid-feedback" role="alert">
+                                    <strong>{{ $message }}</strong>
+                                </span>
+                            @enderror
+                        </div>
+                    </div>
+
+                    <div class="form-group row">
+                        <label for="keterangan" class="col-md-4 col-form-label text-md-right">{{ __('Keterangan') }}</label>
+
+                        <div class="col-md-6">
+                            <textarea id="keterangan" type="text" class="form-control @error('keterangan') is-invalid @enderror" name="keterangan" required autocomplete="keterangan" autofocus>{{ old('keterangan') }}</textarea>
+
+                            @error('keterangan')
                                 <span class="invalid-feedback" role="alert">
                                     <strong>{{ $message }}</strong>
                                 </span>

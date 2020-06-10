@@ -1,10 +1,10 @@
 <?php
 
 use Illuminate\Database\Seeder;
-use App\Model\StatusUser;
-use App\User;
 
 use Illuminate\Support\Facades\Hash;
+
+use App\User;
 
 class UserSeeder extends Seeder
 {
@@ -15,20 +15,24 @@ class UserSeeder extends Seeder
      */
     public function run()
     {
-        $status_user = StatusUser::create([
-    		'keterangan' => 'admin'
-    	]);
-        $status_user = StatusUser::create([
-            'keterangan' => 'user'
+        User::create([
+        	'name' => 'Admin Tamvan',
+            'username' => 'admin',
+        	'email' => 'admin@localhost',
+        	'email_verified_at' => now(),
+        	'password' => Hash::make('admin'),
+            'phone' => '+6233448494839',
+        	'level' => 'admin'
         ]);
 
-        $user = User::create([
-        	'name' => 'DAADasdsd',
-        	'telp' => '123123123123',
-        	'username' => 'admin',
-        	'password' => Hash::make('admin'),
-        	'alamat' => 'dsadsaadssdasdasad',
-        	'status_user_id' => $status_user->id
+        User::create([
+            'name' => 'User Tamvan',
+            'username' => 'user',
+            'email' => 'user@localhost',
+            'email_verified_at' => now(),
+            'password' => Hash::make('user'),
+            'phone' => '+6281332332245',
+            'level' => 'user'
         ]);
     }
 }

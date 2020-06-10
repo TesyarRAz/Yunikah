@@ -5,159 +5,165 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 
-use App\Model\Pemesanan;
-use App\Model\DataPemesanan;
-use App\Model\StatusPemesanan;
+use App\Model\PilihanProduk;
+use App\Model\Produk;
 use App\Model\Paket;
-use App\Model\Kategori;
-use App\User;
-
-use Auth;
-use DB;
-use Validator;
+use App\Model\PemesananProduk;
+use App\Model\PemesananPaket;
 
 class PemesananController extends Controller
 {
-    public function index()
+    public function show_pemesanan_produk()
     {
-        $pemesanan = Pemesanan::with('data')->with('status')->where([
-            'user_id' => Auth::id()
-        ])->get();
+        $data = auth()->user()->pemesanan_produk()->paginate(10);
 
-        return response($pemesanan, 200);
+        return response($data, 200);
     }
 
-    public function show($pemesanan_id)
+    public function show_pemesanan_paket()
     {
-        $pemesanan = Pemesanan::with('data')->with('status')->where([
-            'user_id' => Auth::id(),
-            'id' => $pemesanan_id
-        ])->first();
+        $data = auth()->user()->pemesanan_paket()->paginate(10);
 
-        return response($pemesanan, 200);
+        return response($data, 200);
     }
 
-    public function pesan_satuan(Request $request, $jenis, $kategori_id)
+    public function produk(Request $request, Produk $produk)
     {
-    	$kategori = Kategori::findOrFail($kategori_id);
-    	$status = StatusPemesanan::where('keterangan', 'keranjang')->first();
-
-    	$pemesanan = Pemesanan::updateOrCreate([
-    		'user_id' => Auth::id(),
-    		'status_pemesanan_id' => $status->id,
-            'jenis' => 'SATUAN'
-    	], [
-    			'user_id' => Auth::id(),
-				'status_pemesanan_id' => $status->id,
-				'alamat' => '',
-				'tanggal_pernikahan' => date('Y-m-d'),
-				'jenis' => 'SATUAN',
-				'harga' => 0
-    		]
-    	);
-
-        $pemesanan->harga = $pemesanan->harga + $kategori->harga;
-        $pemesanan->save();
-
-    	$data_pemesanan = DataPemesanan::create([
-    		'pemesanan_id' => $pemesanan->id,
-    		'kategori_id' => $kategori_id
-    	]);
-
-    	return response(['message' => 'Berhasil masukan keranjang'], 200);
-    }
-
-    public function pesan_paket(Request $request, $paket_id)
-    {
-    	$paket = Paket::findOrFail($paket_id);
-    	$status = StatusPemesanan::where('keterangan', 'keranjang')->first();
-
-    	$pemesanan = Pemesanan::create([
-    		'user_id' => Auth::id(),
-    		'status_pemesanan_id' => $status->id,
-    		'alamat' => '',
-    		'tanggal_pernikahan' => date('Y-m-d'),
-    		'jenis' => 'PAKET',
-    		'harga' => $paket->harga
-    	]);
-
-        foreach ($paket->data as $d)
+    	if ($produk->type == 'tersedia')
         {
-            DataPemesanan::create([
-                'pemesanan_id' => $pemesanan->id,
-                'kategori_id' => $d->id
+            $request->validate([
+                'pilihan_produk_id' => 'required|exists:pilihan_produks,id'
+            ]);
+
+            $pilihan_produk = PilihanProduk::findOrFail($request->pilihan_produk_id);
+            $pemesanan_produk = PemesananProduk::create([
+                'user_id' => auth()->id(),
+				// Menggunakan Default Keranjang Dengan ID 1
+                'status_pemesanan_id' => 1,
+                'produk_id' => $produk->id,
+                'alamat' => '',
+                'harga' => $pilihan_produk->harga,
+                'tanggal_pernikahan' => now(),
+                'kuantitas' => 1
             ]);
         }
+        else if ($kategori->type == 'custom')
+        {
+            $this->validate($request, [
+                'kuantitas' => 'required|numeric'
+            ]);
+
+			$pemesanan_produk = PemesananProduk::create([
+                'user_id' => auth()->id(),
+				// Menggunakan Default Keranjang Dengan ID 1
+                'status_pemesanan_id' => 1,
+                'produk_id' => $produk->id,
+                'alamat' => '',
+                'harga' => $produk->harga * (int) $request->kuantitas,
+                'tanggal_pernikahan' => now(),
+                'kuantitas' => $request->kuantitas
+            ]);
+        }
+        else if ($kategori->type == 'combo')
+        {
+            if (!empty($request->kuantitas))
+            {
+                $pemesanan_produk = PemesananProduk::create([
+	                'user_id' => auth()->id(),
+					// Menggunakan Default Keranjang Dengan ID 1
+	                'status_pemesanan_id' => 1,
+	                'produk_id' => $produk->id,
+	                'alamat' => '',
+	                'harga' => $produk->harga * (int) $request->kuantitas,
+	                'tanggal_pernikahan' => now(),
+	                'kuantitas' => $request->kuantitas
+	            ]);
+            }
+            elseif (!empty($request->pilihan_produk_id))
+            {
+                $pilihan_produk = PilihanProduk::findOrFail($request->pilihan_produk_id);
+	            $pemesanan_produk = PemesananProduk::create([
+	                'user_id' => auth()->id(),
+					// Menggunakan Default Keranjang Dengan ID 1
+	                'status_pemesanan_id' => 1,
+	                'produk_id' => $produk->id,
+	                'alamat' => '',
+	                'harga' => $pilihan_produk->harga,
+	                'tanggal_pernikahan' => now(),
+	                'kuantitas' => 1
+	            ]);
+            }
+            else
+            {
+                return response(['message' => 'Harus pilih salah satu'], 402);
+            }
+        }
+
+        return response(['message' => 'Berhasil masukan keranjang'], 200);
+    }
+
+    public function paket(Request $request, Paket $paket)
+    {
+    	PemesananPaket::create([
+    		'user_id' => auth()->id(),
+			// Menggunakan Default Keranjang Dengan ID 1
+            'status_pemesanan_id' => 1,
+            'paket_id' => $paket->id,
+            'alamat' => '',
+            'harga' => $paket->harga,
+            'tanggal_pernikahan' => now(),
+    	]);
 
     	return response(['message' => 'Berhasil masukan keranjang'], 200);
     }
 
-    public function checkout(Request $request)
+    public function checkout_produk(Request $request, Produk $produk)
     {
-        $validator = Validator::make($request->all(), [
-            'alamat' => 'required',
+    	$request->validate([
+			'alamat' => 'required',
             'tanggal_pernikahan' => 'required|date'
-        ]);
+    	]);
 
-        if ($validator->fails())
-        {
-            return response(['error' => $validator->errors()], 422);
-        }
+    	$pemesanans = auth()->user()->pemesanan_produk()
+    	// Menggunakan Default Keranjang Dengan ID 1
+    	->where('status_pemesanan_id', 1)
+    	->where('produk_id', $produk->id)
+    	->get();
 
-    	$status = StatusPemesanan::where('keterangan', 'keranjang')->first();
-    	$status_dikirim = StatusPemesanan::where('keterangan', 'dikirim')->first();
+    	foreach ($pemesanans as $pemesanan)
+    	{
+    		$pemesanan->status_pemesanan_id = 2;
+    		$pemesanan->tanggal_pernikahan = $request->tanggal_pernikahan;
+    		$pemesanan->alamat = $request->alamat;
 
-    	$pemesanan = Pemesanan::where([
-    		'user_id' => Auth::id(),
-    		'status_pemesanan_id' => $status->id
-    	])->get();
+    		$pemesanan->save();
+    	}
 
-        foreach ($pemesanan as $p)
-        {
-            $p->status_pemesanan_id = $status_dikirim->id;
-            $p->alamat = $request->alamat;
-            $p->tanggal_pernikahan = $request->tanggal_pernikahan;
-            $p->save();
-        }
-
-        return response(['message' => 'Berhasil checkout, tinggal tunggu respon admin'], 200);
+    	return response(['message' => 'Berhasil Checkout'], 200);
     }
 
-    public function hapus_pemesanan($id_pemesanan)
+    public function checkout_paket(Request $request, Paket $paket)
     {
-        $pemesanan = Pemesanan::with('data')->where([
-            'user_id' => Auth::id(),
-            'id' => $id_pemesanan
-        ])->firstOrFail();
+    	$request->validate([
+			'alamat' => 'required',
+            'tanggal_pernikahan' => 'required|date'
+    	]);
 
-        DB::table('data_pemesanans')->where('pemesanan_id', $id_pemesanan)->delete();
-        $pemesanan->delete();
+    	$pakets = auth()->user()->pemesanan_paket()
+    	// Menggunakan Default Keranjang Dengan ID 1
+    	->where('status_pemesanan_id', 1)
+    	->where('paket_id', $paket->id)
+    	->get();
 
-        return response(['message' => 'Berhasil hapus pemesanan']);
-    }
+    	foreach ($pakets as $paket)
+    	{
+    		$paket->status_pemesanan_id = 2;
+    		$paket->tanggal_pernikahan = $request->tanggal_pernikahan;
+    		$paket->alamat = $request->alamat;
 
-    public function hapus_satuan($id_data_pemesanan)
-    {
-        $data_pemesanan = DataPemesanan::findOrFail($id_data_pemesanan);
-        $pemesanan = $data_pemesanan->pemesanan;
-        
-        if ($pemesanan->user_id == Auth::id())
-        {
-            if ($pemesanan->jenis == 'PAKET')
-            {
-                return response(['message' => '1 paket, tidak bisa dihapus'], 200);
-            }
+    		$paket->save();
+    	}
 
-            $data_pemesanan->delete();
-
-            if (count($pemesanan->data) < 1)
-            {
-                $pemesanan->delete();
-            }
-
-            return response(['message' => 'Berhasil hapus data pemesanan'], 200);
-        }
-
-        return response(['error' => 'Unauthorized User'], 401);
+    	return response(['message' => 'Berhasil Checkout'], 200);
     }
 }

@@ -5,10 +5,7 @@ namespace App;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
-
-use Laravel\Passport\HasApiTokens;
-
-use App\Model\StatusUser;
+use Laravel\Sanctum\HasApiTokens;
 
 class User extends Authenticatable
 {
@@ -19,9 +16,7 @@ class User extends Authenticatable
      *
      * @var array
      */
-    protected $fillable = [
-        'name', 'telp', 'username', 'password', 'alamat', 'status_user_id'
-    ];
+    protected $guarded = ['id'];
 
     /**
      * The attributes that should be hidden for arrays.
@@ -32,8 +27,22 @@ class User extends Authenticatable
         'password', 'remember_token',
     ];
 
-    public function status()
+    /**
+     * The attributes that should be cast to native types.
+     *
+     * @var array
+     */
+    protected $casts = [
+        'email_verified_at' => 'datetime',
+    ];
+
+    public function pemesanan_paket()
     {
-        return $this->belongsTo(StatusUser::class, 'status_user_id');
+        return $this->hasMany('App\Model\PemesananPaket');
+    }
+
+    public function pemesanan_produk()
+    {
+        return $this->hasMany('App\Model\PemesananProduk');
     }
 }

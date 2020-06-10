@@ -4,13 +4,12 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 
-use App\Model\Paket;
-use App\Model\StatusKategori;
-use App\Model\Asset;
+use App\Http\Requests\PaketRequest;
 
-use DB;
-use File;
 use Str;
+
+use App\Model\Paket;
+use App\Model\Asset;
 
 class PaketController extends Controller
 {
@@ -21,12 +20,7 @@ class PaketController extends Controller
      */
     public function index()
     {
-        $data = request()->filterQuery->with('image')->with('data')->get();
-
-        if (request()->routeIs('api'))
-        {
-            return response($data, 200);
-        }
+        $data = Paket::paginate(10);
 
         return view('paket.index', compact('data'));
     }
@@ -47,32 +41,19 @@ class PaketController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(PaketRequest $request)
     {
-        $this->validate($request, [
-            'name' => 'required',
-            'harga' => 'required|numeric',
-            'image' => 'required|file|image|mimes:jpg,png,jpeg'
-        ]);
+        $paket = new Paket;
 
-        $data = new Paket;
-        $data->name = $request->name;
-        $data->harga = $request->harga;
+        $paket->fill($request->only(['name', 'harga', 'keterangan']));
 
-        if ($request->hasFile('image') && $request->image->isValid())
-        {
-            $asset = Asset::create([
-                'name' => Str::random(50) . '.' . $request->image->getClientOriginalExtension(),
-                'type' => 'image'
-            ]);
+        $this->fillAssetImage($paket);
 
-            $data->image_id = $asset->id;
-            $request->image->move(public_path('uploads/images'), $asset->name);
-        }
+        $paket->save();
 
-        $data->save();
-
-        return redirect()->route('paket.index')->with('status', 'Berhasil ditambahkan');
+        return redirect()
+        ->route('paket.index')
+        ->with('status', 'Berhasil tambah data');
     }
 
     /**
@@ -83,12 +64,7 @@ class PaketController extends Controller
      */
     public function show($id)
     {
-        $data = Paket::with('image')->with('data')->with('data.kategori.image')->find($id);
-
-        if (request()->routeIs('api'))
-        {
-            return response($data, 200);
-        }
+        //
     }
 
     /**
@@ -97,11 +73,9 @@ class PaketController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function edit($id)
+    public function edit(Paket $paket)
     {
-        $data = Paket::findOrFail($id);
-
-        return view('paket.edit', compact('data'));
+        return view('paket.edit', compact('paket'));
     }
 
     /**
@@ -111,32 +85,17 @@ class PaketController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(PaketRequest $request, Paket $paket)
     {
-        $this->validate($request, [
-            'name' => 'required',
-            'harga' => 'required|numeric',
-            'image' => 'file|image|mimes:jpg,png,jpeg'
-        ]);
+        $paket->fill($request->only(['name', 'harga', 'keterangan']));
 
-        $data = Paket::findOrFail($id);
-        $data->name = $request->name;
-        $data->harga = $request->harga;
+        $this->fillAssetImage($paket);
 
-        if ($request->hasFile('image') && $request->image->isValid())
-        {
-            $asset = Asset::create([
-                'name' => Str::random(50) . '.' . $request->image->getClientOriginalExtension(),
-                'type' => 'image'
-            ]);
+        $paket->save();
 
-            $data->image_id = $asset->id;
-            $request->image->move(public_path('uploads/images'), $asset->name);
-        }
-
-        $data->save();
-
-        return redirect()->route('paket.index')->with('status', 'Berhasil diedit');
+        return redirect()
+        ->route('paket.index')
+        ->with('status', 'Berhasil edit data');
     }
 
     /**
@@ -145,11 +104,26 @@ class PaketController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy(Paket $paket)
     {
-        $data = Paket::findOrFail($id);
+        $paket->delete();
 
-        return redirect()->route('paket.index')
-        ->with('status', $data->delete() ? 'Berhasil dihapus' : 'Gagal dihapus');
+        return redirect()
+        ->route('paket.index')
+        ->with('status', 'Berhasil hapus data');
+    }
+
+    private function fillAssetImage($model)
+    {
+        if (request()->hasFile('image') && request()->image->isValid())
+        {
+            $asset = Asset::create([
+                'name' => Str::random(50) . '.' . request()->image->getClientOriginalExtension(),
+                'type' => 'image'
+            ]);
+
+            $model->image_id = $asset->id;
+            request()->image->move(public_path('assets/images'), $asset->name);
+        }
     }
 }
