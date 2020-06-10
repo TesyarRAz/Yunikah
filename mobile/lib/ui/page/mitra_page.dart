@@ -1,10 +1,11 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:shimmer/shimmer.dart';
-import 'package:yunikah/model/kategori.dart';
+import 'package:yunikah/model/api_data.dart';
 import 'package:yunikah/model/mitra.dart';
+import 'package:yunikah/model/produk.dart';
 import 'package:yunikah/network.dart';
-import 'package:yunikah/ui/home/detail_kategori_page.dart';
+import 'package:yunikah/ui/page.dart';
 
 class MitraPage extends StatelessWidget {
   final Mitra mitra;
@@ -91,15 +92,15 @@ class MitraPage extends StatelessWidget {
                   ),
                   SizedBox(height: 50,),
                   Text(
-                    'Produk Lainnya',
+                    'Produk Mitra',
                     style: Theme.of(context).textTheme.title.apply(
                       fontSizeDelta: 0.5
                     ),
                   ),
 
                   FutureBuilder(
-                    future: Network.instance.mitraKategori(mitra),
-                    builder: (context, AsyncSnapshot<List<Kategori>> snapshot) {
+                    future: Network.instance.mitraProduk(mitra, 1),
+                    builder: (context, AsyncSnapshot<ApiData<Produk>> snapshot) {
                       if (snapshot.connectionState == ConnectionState.waiting) {
                         return GridView.count(
                           shrinkWrap: true,
@@ -116,11 +117,11 @@ class MitraPage extends StatelessWidget {
                             ),
                           )),
                         );
-                      } else if (snapshot.connectionState == ConnectionState.done) {
+                      } else if (snapshot.connectionState == ConnectionState.done && snapshot.hasData && snapshot.data.data.length > 0) {
                         return GridView.count(
                           shrinkWrap: true,
                           crossAxisCount: 2,
-                          children: snapshot.data.map((kategori) => _buildKategoriItem(context, kategori)).toList(),
+                          children: snapshot.data.data.map((produk) => _buildProdukItem(context, produk)).toList(),
                         );
                       }
 
@@ -138,14 +139,14 @@ class MitraPage extends StatelessWidget {
     );
   }
 
-  Widget _buildKategoriItem(BuildContext context, Kategori kategori) => SizedBox.fromSize(
+  Widget _buildProdukItem(BuildContext context, Produk produk) => SizedBox.fromSize(
     size: Size.fromHeight(200),
     child: Card(
       child: InkWell(
         onTap: () {
           Navigator.of(context).push(
             MaterialPageRoute(
-              builder: (_) => DetailKategoriPage(kategori: kategori)
+              builder: (_) => DetailProdukPage(produk: produk)
             )
           );
         },
@@ -155,7 +156,7 @@ class MitraPage extends StatelessWidget {
             children: [
               Expanded(
                 child: CachedNetworkImage(
-                  imageUrl: kategori.image.link,
+                  imageUrl: produk.image.link,
                   imageBuilder: (context, imageProvider) => Container(
                     decoration: BoxDecoration(
                       image: DecorationImage(
@@ -167,7 +168,7 @@ class MitraPage extends StatelessWidget {
                 )
               ),
               Text(
-                kategori.name,
+                produk.name,
                 style: Theme.of(context).textTheme.subtitle,
               )
             ]

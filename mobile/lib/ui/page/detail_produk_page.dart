@@ -1,27 +1,26 @@
-
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:yunikah/constant/routes.dart';
 import 'package:yunikah/helper.dart';
-import 'package:yunikah/model/kategori.dart';
+import 'package:yunikah/model/api_data.dart';
+import 'package:yunikah/model/produk.dart';
 import 'package:yunikah/network.dart';
-import 'package:yunikah/ui/home/kategori_page.dart';
-import 'package:yunikah/ui/home/mitra_page.dart';
+import 'package:yunikah/ui/page.dart';
 
-class DetailKategoriPage extends StatefulWidget {
-  final Kategori kategori;
+class DetailProdukPage extends StatefulWidget {
+  final Produk produk;
 
-  DetailKategoriPage({this.kategori});
+  DetailProdukPage({this.produk});
 
   @override
-  State<StatefulWidget> createState() => _DetailKategoriPageState();
+  State<StatefulWidget> createState() => _DetailProdukPageState();
 }
 
-class _DetailKategoriPageState extends State<DetailKategoriPage> with SingleTickerProviderStateMixin {
+class _DetailProdukPageState extends State<DetailProdukPage> with SingleTickerProviderStateMixin {
   final scaffoldState = GlobalKey<ScaffoldState>();
   AnimationController _bottomAnimation;
-  DataKategori _data;
+  // DetailProduk _data;
 
   @override
   void initState() {
@@ -48,7 +47,7 @@ class _DetailKategoriPageState extends State<DetailKategoriPage> with SingleTick
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
               CachedNetworkImage(
-                imageUrl: widget.kategori.image.link,
+                imageUrl: widget.produk.image.link,
                 imageBuilder: (_, imageProvider) => Container(
                   height: 200,
                   decoration: BoxDecoration(
@@ -68,9 +67,9 @@ class _DetailKategoriPageState extends State<DetailKategoriPage> with SingleTick
                         Row(
                           children: <Widget>[
                             CachedNetworkImage(
-                              imageUrl: widget.kategori.mitra.image.link,
+                              imageUrl: widget.produk.mitra.image.link,
                               imageBuilder: (_, imageProvider) => Hero(
-                                tag: widget.kategori.mitra,
+                                tag: widget.produk.mitra,
                                 child: CircleAvatar(
                                   backgroundImage: imageProvider,
                                   radius: 30,
@@ -79,7 +78,7 @@ class _DetailKategoriPageState extends State<DetailKategoriPage> with SingleTick
                             ),
                             SizedBox(width: 20,),
                             Text(
-                              widget.kategori.mitra.name.length > 20 ? widget.kategori.mitra.name.substring(0, widget.kategori.mitra.name.length % 20) : widget.kategori.mitra.name,
+                              widget.produk.mitra.name.length > 20 ? widget.produk.mitra.name.substring(0, widget.produk.mitra.name.length % 20) : widget.produk.mitra.name,
                               style: Theme.of(context).textTheme.title,
                             )
                           ],
@@ -92,7 +91,7 @@ class _DetailKategoriPageState extends State<DetailKategoriPage> with SingleTick
                               child: Text('Kunjungi Mitra'),
                               onPressed: () {
                                 Navigator.of(context).push(
-                                  Routes.generatePage((_) => MitraPage(mitra: widget.kategori.mitra))
+                                  Routes.generatePage((_) => MitraPage(mitra: widget.produk.mitra))
                                 );
                               },
                             ),
@@ -157,12 +156,12 @@ class _DetailKategoriPageState extends State<DetailKategoriPage> with SingleTick
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
                     Text(
-                      widget.kategori.name,
+                      widget.produk.name,
                       style: Theme.of(context).textTheme.title,
                     ),
                     SizedBox(height: 50,),
                     Text(
-                      widget.kategori.keterangan,
+                      widget.produk.keterangan ?? "",
                       style: Theme.of(context).textTheme.body2,
                     ),
                     Divider(),
@@ -173,10 +172,10 @@ class _DetailKategoriPageState extends State<DetailKategoriPage> with SingleTick
                         fontSizeDelta: 0.5
                       ),
                     ),
-
+                    
                     FutureBuilder(
-                      future: Network.instance.neighbordKategori(widget.kategori),
-                      builder: (context, AsyncSnapshot<List<Kategori>> snapshot) {
+                      future: Network.instance.neighbordProduk(widget.produk, 1),
+                      builder: (context, AsyncSnapshot<ApiData<Produk>> snapshot) {
                         if (snapshot.connectionState == ConnectionState.waiting) {
                           return GridView.count(
                             shrinkWrap: true,
@@ -193,15 +192,20 @@ class _DetailKategoriPageState extends State<DetailKategoriPage> with SingleTick
                               ),
                             )),
                           );
-                        } else if (snapshot.connectionState == ConnectionState.done) {
+                        } else if (snapshot.connectionState == ConnectionState.done && snapshot.hasData && snapshot.data.data.length > 0) {
                           return GridView.count(
                             shrinkWrap: true,
                             crossAxisCount: 2,
-                            children: snapshot.data.map((kategori) => _buildKategoriItem(kategori)).toList(),
+                            children: snapshot.data.data.map((produk) => _buildProdukItem(produk)).toList(),
                           );
                         }
 
-                        return Container();
+                        return SizedBox.fromSize(
+                          size: Size.fromHeight(200),
+                          child: Center(
+                            child: Text('Belum Ada Produk')
+                          ),
+                        );
                       },
                     )
                   ],
@@ -222,7 +226,7 @@ class _DetailKategoriPageState extends State<DetailKategoriPage> with SingleTick
               )
             );
 
-            Network.instance.pesanSatuan(widget.kategori)
+            Network.instance.pesanProduk(widget.produk)
             .then((success) {
               Navigator.of(context).pop();
               if (success) {
@@ -249,14 +253,14 @@ class _DetailKategoriPageState extends State<DetailKategoriPage> with SingleTick
     );
   }
 
-  Widget _buildKategoriItem(Kategori kategori) => SizedBox.fromSize(
+  Widget _buildProdukItem(Produk produk) => SizedBox.fromSize(
     size: Size.fromHeight(200),
     child: Card(
       child: InkWell(
         onTap: () {
           Navigator.of(context).push(
             MaterialPageRoute(
-              builder: (_) => DetailKategoriPage(kategori: kategori)
+              builder: (_) => DetailProdukPage(produk: produk)
             )
           );
         },
@@ -266,7 +270,7 @@ class _DetailKategoriPageState extends State<DetailKategoriPage> with SingleTick
             children: [
               Expanded(
                 child: CachedNetworkImage(
-                  imageUrl: kategori.image.link,
+                  imageUrl: produk.image.link,
                   imageBuilder: (context, imageProvider) => Container(
                     decoration: BoxDecoration(
                       image: DecorationImage(
@@ -278,7 +282,7 @@ class _DetailKategoriPageState extends State<DetailKategoriPage> with SingleTick
                 )
               ),
               Text(
-                kategori.name,
+                produk.name,
                 style: Theme.of(context).textTheme.subtitle,
               )
             ]

@@ -1,80 +1,89 @@
-import 'dart:math';
+import 'dart:convert';
 
+import 'package:http/http.dart' show Client;
+import 'package:yunikah/model/api_data.dart';
 import 'package:yunikah/model/iklan.dart';
-import 'package:yunikah/model/kategori.dart';
 import 'package:yunikah/model/mitra.dart';
 import 'package:yunikah/model/paket.dart';
-import 'package:yunikah/model/pemesanan.dart';
-import 'package:yunikah/model/sample.dart';
+import 'package:yunikah/model/produk.dart';
 import 'package:yunikah/model/user.dart';
 
 class Network {
   static final instance = Network._();
+
   static const RANDOM_IMAGE_LINK = "https://source.unsplash.com/random";
+  static const API_URL = "http://192.168.43.126/api/";
 
   Network._();
 
-  Future<bool> pesanSatuan(Kategori kategori) async {
+  final _client = Client();
+
+  Future<bool> pesanProduk(Produk produk) async {
     return Future.delayed(Duration(seconds: 5), () {
-      kListPemesanan[0].data.add(DataPemesanan(
-        id: Random().nextInt(999),
-        kategori: kategori
-      ));
 
       return true;
     });
   }
 
-  Future<List<Pemesanan>> allPemesanan() async {
-    return Future.delayed(Duration(seconds: 5), () {
-      return kListPemesanan;
-    });
+  Future<ApiData<Produk>> mitraProduk(Mitra mitra, int page) async {
+    return ApiData.parseFromJson(
+      await _client.get(API_URL + "mitra/${mitra.id}")
+      .then((response) => jsonDecode(response.body))
+      .then((data) => data['produks']),
+      parseProdukFromJson
+    );
   }
 
-  Future<List<Kategori>> mitraKategori(Mitra mitra, [int limit = 10, int offset = 0]) async {
+  Future<ApiData<Produk>> neighbordProduk(Produk produk, int page) async {
     return Future.delayed(Duration(seconds: 5), () {
-      return kListKategori.where((kategori) => kategori.mitra.id == mitra.id).toList();
+
+      return null;
     });
+    // return parseProdukFromJson(
+    //   await _client.get(API_URL + "mitra/${produk.mitra.id}/?page=$page")
+    //   .then((response) => jsonDecode(response.body))
+    //   .then((data) => data['produks'])
+    // )
+    // .where((neighboard) => produk.id != neighboard.id).toList();
   }
 
-  Future<List<Kategori>> neighbordKategori(Kategori kategori, [int limit = 10, int offset = 0]) async {
-    return Future.delayed(Duration(seconds: 5), () {
-      return kListKategori.where((neighbord) => kategori.mitra.id == neighbord.mitra.id && kategori.id != neighbord.id).toList();
-    });
-  }
-
-  Future<List<Paket>> allPaket([int limit = 10, int offset = 0]) async {
-    return Future.delayed(Duration(seconds: 5), () {
-      return kListPaket;
-    });
+  Future<ApiData<Paket>> allPaket(int page) async {
+    return ApiData.parseFromJson(
+      await _client.get(API_URL + "paket/?page=$page").then((response) => jsonDecode(response.body)),
+      parsePaketFromJson
+    );
   }
   
-  Future<List<Mitra>> allMitra([int limit = 10, int offset = 0]) async {
-    return Future.delayed(Duration(seconds: 5), () {
-      return kListMitra;
-    });
+  Future<ApiData<Mitra>> allMitra(int page) async {
+    return ApiData.parseFromJson(
+      await _client.get(API_URL + "mitra/?page=$page").then((response) => jsonDecode(response.body)),
+      parseMitraFromJson
+    );
   }
 
-  Future<List<Iklan>> allIklan([int limit = 10, int offset = 0]) async {
-    return Future.delayed(Duration(seconds: 5), () {
-      return kListIklan;
-    });
+  Future<ApiData<Iklan>> allIklan(int page) async {
+    return ApiData.parseFromJson(
+      await _client.get(API_URL + "iklan/?page=$page").then((response) => jsonDecode(response.body)),
+      parseIklanFromJson
+    );
   }
 
-  Future<List<Kategori>> allKategori(String kategori, [int limit = 10, int offset = 0]) async {
-    return Future.delayed(Duration(seconds: 5), () {
-      return kListKategori;
-    });
+  Future<ApiData<Produk>> allProduk(String kategori, int page) async {
+    return ApiData.parseFromJson(
+      await _client.get(API_URL + "produk/$kategori/?page=$page").then((response) => jsonDecode(response.body)),
+      parseProdukFromJson
+    );
   }
 
   Future<User> login(String username, String password) async {
-    return Future.delayed(Duration(seconds: 5), () {
-      return User(
-        name: username,
-        username: username,
-        password: password,
-        token: "uidsjauisad9-1312"
-      );
-    });
+    var result = await _client.post(
+      API_URL + "auth/login", 
+      body: {
+        'username' : username,
+        'password' : password
+      }
+    );
+
+    return result.statusCode == 200 ? User.parseFromJson(jsonDecode(result.body)) : null;
   }
 }

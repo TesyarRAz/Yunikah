@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:yunikah/provider/auth_provider.dart';
-import 'package:yunikah/ui/home/home_page.dart';
-import 'package:yunikah/ui/keranjang/keranjang_page.dart';
-import 'package:yunikah/ui/login/splash_login_page.dart';
-import 'package:yunikah/ui/profile/profile_page.dart';
+import 'package:yunikah/ui/page/home/home_page.dart';
+import 'package:yunikah/ui/page/keranjang/keranjang_page.dart';
+import 'package:yunikah/ui/page/login/splash_login_page.dart';
+import 'package:yunikah/ui/page/profile/profile_page.dart';
 
 class MenuPage extends StatefulWidget {
   @override
@@ -87,7 +87,7 @@ class _MenuPageState extends State<MenuPage> {
           icon: Icon(Icons.shopping_cart)
         ),
         BottomNavigationBarItem(
-          title: Text(Provider.of<AuthProvider>(context, listen: false).isAuthorized ? 'Profile' : 'Login'),
+          title: Text('Profile'),
           icon: Icon(Icons.account_box)
         )
       ],

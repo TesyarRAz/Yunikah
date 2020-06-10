@@ -1,20 +1,21 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:yunikah/constant/routes.dart';
-import 'package:yunikah/model/kategori.dart';
-import 'package:yunikah/model/sample.dart';
-import 'package:yunikah/ui/home/detail_kategori_page.dart';
+import 'package:yunikah/model/api_data.dart';
+import 'package:yunikah/model/produk.dart';
+import 'package:yunikah/network.dart';
+import 'package:yunikah/ui/page.dart';
 
-class KategoriPage extends StatefulWidget {
-  final StatusKategori statusKategori;
+class ProdukPage extends StatefulWidget {
+  final Kategori kategori;
 
-  KategoriPage({this.statusKategori});
+  ProdukPage({this.kategori});
 
   @override
-  State<StatefulWidget> createState() => _KategoriPageState();
+  State<StatefulWidget> createState() => _ProdukPageState();
 }
 
-class _KategoriPageState extends State<KategoriPage> {
+class _ProdukPageState extends State<ProdukPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -42,26 +43,40 @@ class _KategoriPageState extends State<KategoriPage> {
           )
         ],
       ),
-      body: ScrollConfiguration(
-        behavior: ScrollBehavior(),
-        child: SingleChildScrollView(
-          child: GridView.count(
-            shrinkWrap: true,
-            crossAxisCount: 2,
-            children: kListKategori.where((kategori) => kategori.status == widget.statusKategori)
-            .map((kategori) => _buildKategoriItem(kategori))
-            .toList(),
-          ),
-        ),
-      ),
+      body: FutureBuilder(
+        future: Network.instance.allProduk(widget.kategori.name, 1),
+        builder: (_, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) 
+            return Center(
+              child: CircularProgressIndicator(),
+            );
+          if (snapshot.connectionState == ConnectionState.done && snapshot.hasData)
+            return _buildBody(snapshot.data);
+
+          return Center(
+            child: Text('Tidak Ada Koneksi Internet'),
+          );
+        },
+      )
     );
   }
 
-  Widget _buildKategoriItem(Kategori kategori) => Card(
+  Widget _buildBody(ApiData<Produk> produks) => ScrollConfiguration(
+    behavior: ScrollBehavior(),
+    child: SingleChildScrollView(
+      child: GridView.count(
+        shrinkWrap: true,
+        crossAxisCount: 2,
+        children: produks.data.map((produk) => _buildProdukItem(produk)).toList(),
+      ),
+    ),
+  );
+
+  Widget _buildProdukItem(Produk produk) => Card(
     child: InkWell(
       onTap: () {
         Navigator.of(context).push(
-          Routes.generatePage((_) => DetailKategoriPage(kategori: kategori,))
+          Routes.generatePage((_) => DetailProdukPage(produk: produk,))
         );
       },
       child: Padding(
@@ -70,9 +85,9 @@ class _KategoriPageState extends State<KategoriPage> {
           children: <Widget>[
             Expanded(
               child: CachedNetworkImage(
-                imageUrl: kategori.image.link,
+                imageUrl: produk.image.link,
                 imageBuilder: (_, imageProvider) => Hero(
-                  tag: kategori,
+                  tag: produk,
                   child: Container(
                     decoration: BoxDecoration(
                       image: DecorationImage(
@@ -88,7 +103,7 @@ class _KategoriPageState extends State<KategoriPage> {
             Column(
               children: <Widget>[
                 Text(
-                  kategori.name,
+                  produk.name,
                   style: Theme.of(context).textTheme.title,
                 )
               ],

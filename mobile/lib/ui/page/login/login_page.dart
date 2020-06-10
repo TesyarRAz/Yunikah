@@ -87,6 +87,16 @@ class _LoginPageState extends State<LoginPage> {
                     Navigator.of(context).pop();
                     if (user != null) {
                       Navigator.of(context).pop(user);
+                    } else {
+                      showDialog(
+                        context: context,
+                        builder: (_) => AlertDialog(
+                          content: Text('Username atau password salah'),
+                        ),
+                      ).then((_) {
+                        _textUsername.clear();
+                        _textPassword.clear();
+                      });
                     }
                   });
                 },

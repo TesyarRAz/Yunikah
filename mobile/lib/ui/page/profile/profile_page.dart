@@ -9,8 +9,8 @@ class ProfilePage extends StatelessWidget {
     final user = Provider.of<AuthProvider>(context, listen: false).value;
     return Scaffold(
       body: UserAccountsDrawerHeader(
-        accountEmail: Text('asd'),
-        accountName: Text('asd'),
+        accountEmail: Text(user.telp),
+        accountName: Text(user.name),
       ),
     );
   }

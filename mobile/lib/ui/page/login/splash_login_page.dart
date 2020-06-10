@@ -4,8 +4,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:yunikah/constant/routes.dart';
 import 'package:yunikah/model/user.dart';
 import 'package:yunikah/provider/auth_provider.dart';
-import 'package:yunikah/ui/login/login_page.dart';
-import 'package:yunikah/ui/register/register_page.dart';
 
 class SplashLoginPage extends StatelessWidget {
   SplashLoginPage({Key key}) : super(key: key);

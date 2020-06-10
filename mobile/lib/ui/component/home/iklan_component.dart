@@ -3,10 +3,11 @@ import 'package:carousel_slider/carousel_slider.dart';
 import 'package:dots_indicator/dots_indicator.dart';
 import 'package:flutter/material.dart';
 import 'package:shimmer/shimmer.dart';
+import 'package:yunikah/model/api_data.dart';
 import 'package:yunikah/model/iklan.dart';
 
 class IklanComponent extends StatefulWidget {
-  final List<Iklan> iklans;
+  final ApiData<Iklan> iklans;
 
   IklanComponent(this.iklans);
   
@@ -21,7 +22,7 @@ class _IklanComponentState extends State<IklanComponent> {
   Widget build(BuildContext context) => Stack(
     children: [
       CarouselSlider(
-        items: widget.iklans.map((iklan) => Container(
+        items: widget.iklans.data.map((iklan) => Container(
           child: CachedNetworkImage(
             imageUrl: iklan.image.link,
             imageBuilder: (context, imageProvider) => Container(
@@ -54,7 +55,7 @@ class _IklanComponentState extends State<IklanComponent> {
       Positioned(
         bottom: 0,
         child: DotsIndicator(
-          dotsCount: widget.iklans.length,
+          dotsCount: widget.iklans.data.length,
           position: index * 1.0,
           decorator: DotsDecorator(
             activeColor: Theme.of(context).primaryColor,

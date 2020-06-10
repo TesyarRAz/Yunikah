@@ -2,16 +2,14 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:yunikah/constant/routes.dart';
-import 'package:yunikah/model/kategori.dart';
+import 'package:yunikah/model/api_data.dart';
+import 'package:yunikah/model/produk.dart';
 import 'package:yunikah/model/mitra.dart';
 import 'package:yunikah/model/paket.dart';
-import 'package:yunikah/model/sample.dart';
 import 'package:yunikah/network.dart';
 import 'package:yunikah/provider/network_provider.dart';
-import 'package:yunikah/ui/home/component/iklan_component.dart';
-import 'package:yunikah/ui/home/kategori_page.dart';
-import 'package:yunikah/ui/home/mitra_page.dart';
-import 'package:yunikah/ui/home/paket_page.dart';
+import 'package:yunikah/ui/page.dart';
+import 'package:yunikah/ui/component/component.dart';
 
 class HomePage extends StatefulWidget {
   HomePage({Key key}) : super(key: key);
@@ -23,21 +21,22 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   Map<String, dynamic> _cacheData;
 
-  ScrollController _mainScroll, _kategoriScroll, _mitraScroll;
+  ScrollController _mainScroll, _produkScroll, _mitraScroll;
 
   @override
   void initState() {
     super.initState();
 
-    _kategoriScroll = ScrollController(initialScrollOffset: 1,keepScrollOffset: true);
-    _mitraScroll = ScrollController(initialScrollOffset: 1,keepScrollOffset: true);
-    _mainScroll = ScrollController(initialScrollOffset: 1,keepScrollOffset: true);
+    _produkScroll = ScrollController(initialScrollOffset: 1, keepScrollOffset: true);
+    _mitraScroll = ScrollController(initialScrollOffset: 1, keepScrollOffset: true);
+    _mainScroll = ScrollController(initialScrollOffset: 1, keepScrollOffset: true);
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: SafeArea(
+        top: false,
         child: FutureBuilder(
           future: _getData(),
           builder: (context, snapshot) {
@@ -93,6 +92,7 @@ class _HomePageState extends State<HomePage> {
             border: OutlineInputBorder(),
             labelText: "Cari disini",
             prefixIcon: Icon(Icons.search),
+            contentPadding: EdgeInsets.zero
           ),
           onTap: () {
             Navigator.of(context).pushNamed(ROUTE_SEARCH);
@@ -149,8 +149,8 @@ class _HomePageState extends State<HomePage> {
           size: Size.fromHeight(100),
           child: ListView(
             physics: BouncingScrollPhysics(),
-            controller: _kategoriScroll,
-            children: kListStatusKategori.map((statusKategori) => _buildKategoriItem(statusKategori)).toList(),
+            controller: _produkScroll,
+            children: kKategori.map((kategori) => _buildKategoriItem(kategori)).toList(),
             scrollDirection: Axis.horizontal,
           )
         )
@@ -158,14 +158,14 @@ class _HomePageState extends State<HomePage> {
     ),
   );
 
-  Widget _buildKategoriItem(StatusKategori statusKategori) => SizedBox.fromSize(
+  Widget _buildKategoriItem(Kategori kategori) => SizedBox.fromSize(
     size: Size.fromWidth(MediaQuery.of(context).size.width / 3),
     child: Card(
       child: InkWell(
         onTap: () {
           Navigator.of(context).push(
             MaterialPageRoute(
-              builder: (_) => KategoriPage(statusKategori: statusKategori)
+              builder: (_) => ProdukPage(kategori: kategori)
             )
           );
         },
@@ -175,7 +175,7 @@ class _HomePageState extends State<HomePage> {
             children: [
               Expanded(
                 child: CachedNetworkImage(
-                  imageUrl: statusKategori.image.link,
+                  imageUrl: kategori.image.link,
                   imageBuilder: (context, imageProvider) => Container(
                     decoration: BoxDecoration(
                       image: DecorationImage(
@@ -187,7 +187,7 @@ class _HomePageState extends State<HomePage> {
                 )
               ),
               Text(
-                statusKategori.name,
+                kategori.name,
                 style: Theme.of(context).textTheme.subtitle,
               )
             ]
@@ -197,7 +197,7 @@ class _HomePageState extends State<HomePage> {
     ),
   );
 
-  Widget _buildPaket(List<Paket> pakets) => Padding(
+  Widget _buildPaket(ApiData<Paket> pakets) => pakets.data.length > 0 ? Padding(
     padding: const EdgeInsets.all(18.0),
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -230,12 +230,12 @@ class _HomePageState extends State<HomePage> {
             padding: EdgeInsets.zero,
             scrollDirection: Axis.horizontal,
             crossAxisCount: 2,
-            children: pakets.map((paket) => _buildPaketItem(paket)).toList(),
+            children: pakets.data.map((paket) => _buildPaketItem(paket)).toList(),
           ),
         )
       ],
     ),
-  );
+  ) : Container();
 
   Widget _buildPaketItem(Paket paket) => SizedBox.fromSize(
     size: Size.fromWidth(MediaQuery.of(context).size.width / 4),
@@ -274,7 +274,7 @@ class _HomePageState extends State<HomePage> {
     ),
   );
 
-  Widget _buildMitra(List<Mitra> mitras) => Padding(
+  Widget _buildMitra(ApiData<Mitra> mitras) => Padding(
     padding: const EdgeInsets.all(18.0),
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -308,7 +308,7 @@ class _HomePageState extends State<HomePage> {
           scrollDirection: Axis.vertical,
           crossAxisCount: 2,
           physics: NeverScrollableScrollPhysics(),
-          children: mitras.getRange(0, 4).map((mitra) => _buildMitraItem(mitra)).toList(),
+          children: mitras.data.map((mitra) => _buildMitraItem(mitra)).toList(),
         ),
       ],
     ),
@@ -354,9 +354,9 @@ class _HomePageState extends State<HomePage> {
     _cacheData = PageStorage.of(context).readState(context, identifier: 'data');
     if (_cacheData == null) {
       return Future.wait([
-        Network.instance.allIklan(),
-        Network.instance.allPaket(),
-        Network.instance.allMitra()
+        Network.instance.allIklan(1),
+        Network.instance.allPaket(1),
+        Network.instance.allMitra(1)
       ])
       .then((value) {
         _cacheData = {

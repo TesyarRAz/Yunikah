@@ -1,10 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:yunikah/ui/home/mitra_page.dart';
-import 'package:yunikah/ui/home/search_page.dart';
-import 'package:yunikah/ui/login/login_page.dart';
-import 'package:yunikah/ui/menu_page.dart';
-import 'package:yunikah/ui/register/register_page.dart';
-import 'package:yunikah/ui/splash_page.dart';
+import 'package:yunikah/ui/page.dart';
 
 const ROUTE_SPLASH = "/";
 const ROUTE_HOME = "/home";
