@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 
+use App\User;
+
 use Auth;
 use Hash;
 
@@ -26,11 +28,18 @@ class UserController extends Controller
 
 		if (auth()->attempt($request->only(['username', 'password'])))
     	{
-            $token = auth()->user()->createToken($request->getClientIp())->plainTextToken;
+            auth()->user()->token = auth()->user()->createToken($request->getClientIp())->plainTextToken;
 
-            return response(['token' => $token], 200);
+            return response(auth()->user(), 200);
     	}
 
     	return response(['error' => 'username atau password salah'], 401);
+    }
+
+    public function logout()
+    {
+        auth()->logout();
+
+        return response([], 200);
     }
 }

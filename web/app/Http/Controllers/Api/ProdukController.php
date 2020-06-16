@@ -17,7 +17,7 @@ class ProdukController extends Controller
      */
     public function index(Kategori $kategori)
     {
-        $data = Produk::with('pilihans')
+        $data = Produk::with('pilihans')->with('mitra')
         ->where('kategori_id', $kategori->id)
         ->paginate(10);
 
@@ -32,7 +32,7 @@ class ProdukController extends Controller
      */
     public function show(Produk $produk)
     {
-        $data = Produk::with('status')
+        $data = Produk::with('status')->with('mitra')
         ->join('kategoris', 'kategoris.id', '=', 'produks.kategori_id')
         ->findOrFail($id);
 

@@ -22,7 +22,7 @@ class CreateUsersTable extends Migration
             $table->string('password');
             
             $table->enum('level', ['admin', 'user'])->default('user');
-            $table->string('phone');
+            $table->string('phone')->unique();
             $table->rememberToken();
             $table->timestamps();
         });
