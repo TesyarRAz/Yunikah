@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 
 use App\Model\Mitra;
+use App\Model\Produk;
 
 class MitraController extends Controller
 {
@@ -33,4 +34,12 @@ class MitraController extends Controller
 
         return response($data, 200);
     }
+
+    public function produk($id)
+    {
+        $data = Produk::with('mitra')->where('mitra_id', $id)->paginate(10);
+
+        return response($data, 200);
+    }
+
 }

@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class Mitra extends Model
 {
     protected $guarded = ['id'];
+    protected $with = ['image'];
 
     public function produks()
     {

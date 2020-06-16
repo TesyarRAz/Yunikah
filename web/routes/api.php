@@ -17,7 +17,10 @@ use Illuminate\Support\Facades\Route;
 Route::namespace('Api')->group(function() {
 	Route::prefix('/auth')->group(function() {
 		Route::post('/login', 'UserController@post');
-		Route::get('/user', 'UserController@index');
+		
+		Route::middleware('auth:api')->group(function() {
+			Route::get('/user', 'UserController@index');
+		});
 	});
 
 	Route::prefix('/produk/{kategori:name}/')->group(function() {
@@ -38,11 +41,15 @@ Route::namespace('Api')->group(function() {
 	Route::prefix('/mitra')->group(function() {
 		Route::get('/', 'MitraController@index');
 		Route::get('/{id}', 'MitraController@show');
+		Route::get('/{id}/produk', 'MitraController@produk');
 	});
 
-	Route::prefix('/pemesanan')->middleware('auth')->group(function() {
+	Route::prefix('/pemesanan')->middleware('auth:api')->group(function() {
 		Route::post('/produk/{produk}', 'PemesananController@produk');
 		Route::post('/paket/{paket}', 'PemesananController@paket');
+
+		Route::get('/produk', 'PemesananController@show_pemesanan_produk');
+		Route::get('/paket', 'PemesananController@show_pemesanan_paket');
 
 		Route::post('/produk/checkout/{produk}', 'PemesananController@checkout_produk');
 		Route::post('/paket/checkout/{paket}', 'PemesananController@checkout_paket');

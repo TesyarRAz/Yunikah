@@ -21,9 +21,7 @@ Route::middleware('auth')->group(function() {
 	Route::name('logout')->post('/logout', 'UserController@logout');
 	Route::name('user.changepassword')->get('/changepassword', 'UserController@change_password_view');
 	Route::name('user.changepassword.post')->post('/changepassword/post', 'UserController@change_password_post');
-	Route::name('apitest')->get('/apitest', function() {
-		return view('apitest');
-	});
+	Route::name('apitest')->get('/apitest', 'HomeController@apitest');
 
 	Route::name('dashboard')->get('/dashbord', 'DashboardController@index');
 
