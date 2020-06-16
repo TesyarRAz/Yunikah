@@ -21,15 +21,16 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   Map<String, dynamic> _cacheData;
 
-  ScrollController _mainScroll, _produkScroll, _mitraScroll;
+  ScrollController _mainScroll, _produkScroll, _paketScroll, _mitraScroll;
 
   @override
   void initState() {
     super.initState();
 
-    _produkScroll = ScrollController(initialScrollOffset: 1, keepScrollOffset: true);
-    _mitraScroll = ScrollController(initialScrollOffset: 1, keepScrollOffset: true);
-    _mainScroll = ScrollController(initialScrollOffset: 1, keepScrollOffset: true);
+    _produkScroll = ScrollController(initialScrollOffset: 0, keepScrollOffset: true);
+    _mitraScroll = ScrollController(initialScrollOffset: 0, keepScrollOffset: true);
+    _paketScroll = ScrollController(initialScrollOffset: 0, keepScrollOffset: true);
+    _mainScroll = ScrollController(initialScrollOffset: 0, keepScrollOffset: true);
   }
 
   @override
@@ -37,47 +38,49 @@ class _HomePageState extends State<HomePage> {
     return Scaffold(
       body: SafeArea(
         top: false,
-        child: FutureBuilder(
-          future: _getData(),
-          builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.waiting) 
-              return Center(
-                child: CircularProgressIndicator(),
-              );
-            else if (snapshot.connectionState == ConnectionState.done && snapshot.hasData)
-              return _buildBody(
-                snapshot.data
-              );
+        child: RefreshIndicator(
+          onRefresh: () async {
+            PageStorage.of(context).writeState(context, null, identifier: 'data');
 
-            return Center(
-              child: Text('Tidak Ada Koneksi Internet'),
-            );
+            setState(() {
+              
+            });
           },
+          child: FutureBuilder(
+            future: _getData(),
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) 
+                return Center(
+                  child: CircularProgressIndicator(),
+                );
+              else if (snapshot.connectionState == ConnectionState.done && snapshot.hasData)
+                return _buildBody(
+                  snapshot.data
+                );
+
+              return Center(
+                child: Text('Tidak Ada Koneksi Internet'),
+              );
+            },
+          ),
         ),
       ),
     );
   }
 
-  Widget _buildBody(Map<String, dynamic> data) => RefreshIndicator(
-    onRefresh: () async {
-      PageStorage.of(context).writeState(context, null, identifier: 'data');
-
-      return await _getData();
-    },
-    child: ScrollConfiguration(
-      behavior: ScrollBehavior(),
-      child: SingleChildScrollView(
-        controller: _mainScroll,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            IklanComponent(data['iklan']),
-            _buildHeader(),
-            _buildKategori(),
-            _buildPaket(data['paket']),
-            _buildMitra(data['mitra'])
-          ],
-        ),
+  Widget _buildBody(Map<String, dynamic> data) => ScrollConfiguration(
+    behavior: ScrollBehavior(),
+    child: SingleChildScrollView(
+      controller: _mainScroll,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          IklanComponent(data['iklan']),
+          _buildHeader(),
+          _buildKategori(),
+          _buildPaket(data['paket']),
+          _buildMitra(data['mitra'])
+        ],
       ),
     ),
   );
@@ -163,35 +166,36 @@ class _HomePageState extends State<HomePage> {
     child: Card(
       child: InkWell(
         onTap: () {
+          print(kategori.url);
           Navigator.of(context).push(
             MaterialPageRoute(
               builder: (_) => ProdukPage(kategori: kategori)
             )
           );
         },
-        child: Padding(
-          padding: const EdgeInsets.all(10.0),
-          child: Column(
-            children: [
-              Expanded(
-                child: CachedNetworkImage(
-                  imageUrl: kategori.image.link,
-                  imageBuilder: (context, imageProvider) => Container(
-                    decoration: BoxDecoration(
-                      image: DecorationImage(
-                        image: imageProvider,
-                        fit: BoxFit.cover
-                      ),
-                    )
-                  ),
-                )
-              ),
-              Text(
+        child: Column(
+          children: [
+            Expanded(
+              child: CachedNetworkImage(
+                imageUrl: kategori.image.link,
+                imageBuilder: (context, imageProvider) => Container(
+                  decoration: BoxDecoration(
+                    image: DecorationImage(
+                      image: imageProvider,
+                      fit: BoxFit.cover
+                    ),
+                  )
+                ),
+              )
+            ),
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Text(
                 kategori.name,
                 style: Theme.of(context).textTheme.subtitle,
-              )
-            ]
-          ),
+              ),
+            )
+          ]
         ),
       ),
     ),
@@ -226,19 +230,18 @@ class _HomePageState extends State<HomePage> {
         ),
         SizedBox.fromSize(
           size: Size.fromHeight(200),
-          child: GridView.count(
-            padding: EdgeInsets.zero,
+          child: ListView(
+            controller: _paketScroll,
             scrollDirection: Axis.horizontal,
-            crossAxisCount: 2,
             children: pakets.data.map((paket) => _buildPaketItem(paket)).toList(),
-          ),
+          )
         )
       ],
     ),
   ) : Container();
 
   Widget _buildPaketItem(Paket paket) => SizedBox.fromSize(
-    size: Size.fromWidth(MediaQuery.of(context).size.width / 4),
+    size: Size.fromWidth(MediaQuery.of(context).size.width / 1.5),
     child: Card(
       child: InkWell(
         onTap: () {
@@ -246,29 +249,29 @@ class _HomePageState extends State<HomePage> {
             Routes.generatePage((_) => PaketPage(paket: paket,))
           );
         },
-        child: Padding(
-          padding: const EdgeInsets.all(10.0),
-          child: Column(
-            children: [
-              Expanded(
-                child: CachedNetworkImage(
-                  imageUrl: paket.image.link,
-                  imageBuilder: (context, imageProvider) => Container(
-                    decoration: BoxDecoration(
-                      image: DecorationImage(
-                        image: imageProvider,
-                        fit: BoxFit.cover
-                      ),
-                    )
-                  ),
-                )
-              ),
-              Text(
+        child: Column(
+          children: [
+            Expanded(
+              child: CachedNetworkImage(
+                imageUrl: paket.image.link,
+                imageBuilder: (context, imageProvider) => Container(
+                  decoration: BoxDecoration(
+                    image: DecorationImage(
+                      image: imageProvider,
+                      fit: BoxFit.cover
+                    ),
+                  )
+                ),
+              )
+            ),
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Text(
                 paket.name,
                 style: Theme.of(context).textTheme.subtitle,
-              )
-            ]
-          ),
+              ),
+            )
+          ]
         ),
       ),
     ),
@@ -306,7 +309,7 @@ class _HomePageState extends State<HomePage> {
           controller: _mitraScroll,
           shrinkWrap: true,
           scrollDirection: Axis.vertical,
-          crossAxisCount: 2,
+          crossAxisCount: 1,
           physics: NeverScrollableScrollPhysics(),
           children: mitras.data.map((mitra) => _buildMitraItem(mitra)).toList(),
         ),
@@ -315,36 +318,36 @@ class _HomePageState extends State<HomePage> {
   );
 
   Widget _buildMitraItem(Mitra mitra) => SizedBox.fromSize(
-    size: Size.fromHeight(150),
+    size: Size.fromHeight(200),
     child: Card(
       elevation: 2,
       child: InkWell(
         onTap: () {
           Navigator.of(context).push(Routes.generatePage((_) => MitraPage(mitra: mitra)));
         },
-        child: Padding(
-          padding: const EdgeInsets.all(10.0),
-          child: Column(
-            children: [
-              Expanded(
-                child: CachedNetworkImage(
-                  imageUrl: mitra.image.link,
-                  imageBuilder: (context, imageProvider) => Container(
-                    decoration: BoxDecoration(
-                      image: DecorationImage(
-                        image: imageProvider,
-                        fit: BoxFit.cover
-                      ),
-                    )
-                  ),
-                )
-              ),
-              Text(
+        child: Column(
+          children: [
+            Expanded(
+              child: CachedNetworkImage(
+                imageUrl: mitra.image.link,
+                imageBuilder: (context, imageProvider) => Container(
+                  decoration: BoxDecoration(
+                    image: DecorationImage(
+                      image: imageProvider,
+                      fit: BoxFit.cover
+                    ),
+                  )
+                ),
+              )
+            ),
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Text(
                 mitra.name,
                 style: Theme.of(context).textTheme.title,
-              )
-            ]
-          ),
+              ),
+            )
+          ]
         ),
       ),
     ),

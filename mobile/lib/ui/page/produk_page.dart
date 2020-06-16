@@ -44,13 +44,13 @@ class _ProdukPageState extends State<ProdukPage> {
         ],
       ),
       body: FutureBuilder(
-        future: Network.instance.allProduk(widget.kategori.name, 1),
-        builder: (_, snapshot) {
+        future: Network.instance.allProduk(widget.kategori.url, 1),
+        builder: (_, AsyncSnapshot<ApiData<Produk>> snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) 
             return Center(
               child: CircularProgressIndicator(),
             );
-          if (snapshot.connectionState == ConnectionState.done && snapshot.hasData)
+          if (snapshot.connectionState == ConnectionState.done && snapshot.hasData && snapshot.data.data.length > 0)
             return _buildBody(snapshot.data);
 
           return Center(
@@ -64,10 +64,22 @@ class _ProdukPageState extends State<ProdukPage> {
   Widget _buildBody(ApiData<Produk> produks) => ScrollConfiguration(
     behavior: ScrollBehavior(),
     child: SingleChildScrollView(
-      child: GridView.count(
-        shrinkWrap: true,
-        crossAxisCount: 2,
-        children: produks.data.map((produk) => _buildProdukItem(produk)).toList(),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Text(
+              widget.kategori.name,
+              style: Theme.of(context).textTheme.title,
+            ),
+          ),
+          GridView.count(
+            shrinkWrap: true,
+            crossAxisCount: 2,
+            children: produks.data.map((produk) => _buildProdukItem(produk)).toList(),
+          )
+        ],
       ),
     ),
   );

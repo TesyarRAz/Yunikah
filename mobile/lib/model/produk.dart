@@ -5,11 +5,12 @@ import 'package:yunikah/network.dart';
 class Kategori {
   int id;
   String name;
+  String url;
 
   // Very Optional, only for system
   Asset image;
 
-  Kategori({this.id, this.name, this.image});
+  Kategori({this.id, this.name, this.url, this.image});
   
   factory Kategori.parseFromJson(Map<String, dynamic> map) => Kategori(
     id: map['id'],
@@ -69,9 +70,9 @@ class Produk {
     name: data['name'],
     keterangan: data['keterangan'],
     image: Asset.parseFromJson(data['image']),
-    // type: KategoriType.values.singleWhere((type) => type.toString() == data['kategori']),
-    data: List.from(data['data']).map((json) => DetailProduk.parseFromJson(json)).toList(),
-    mitra: Mitra.parseFromJson(data['mitra'])
+    type: data['type'] == "tersedia" ? ProdukType.TERSEDIA : data['type'] == "pilihan" ? ProdukType.COMBO : ProdukType.CUSTOM,
+    mitra: Mitra.parseFromJson(data['mitra']),
+    data: data['pilihans'] == null ? null : (data['pilihans'] as List<dynamic>).map((json) => DetailProduk.parseFromJson(json)).toList()
   );
 }
 
@@ -81,6 +82,7 @@ final List<Kategori> kKategori = [
   Kategori(
     id: 1,
     name: 'Rias',
+    url: 'rias',
     image: Asset(
       link: "${Network.RANDOM_IMAGE_LINK}/32"
     )
@@ -88,6 +90,7 @@ final List<Kategori> kKategori = [
   Kategori(
     id: 2,
     name: 'Hiburan',
+    url: 'hiburan',
     image: Asset(
       link: "${Network.RANDOM_IMAGE_LINK}/37"
     )
@@ -95,6 +98,7 @@ final List<Kategori> kKategori = [
   Kategori(
     id: 3,
     name: 'Undangan',
+    url: 'undangan',
     image: Asset(
       link: "${Network.RANDOM_IMAGE_LINK}/76"
     )
@@ -102,6 +106,7 @@ final List<Kategori> kKategori = [
   Kategori(
     id: 4,
     name: 'Tenda',
+    url: 'tenda',
     image: Asset(
       link: "${Network.RANDOM_IMAGE_LINK}/56"
     )
@@ -109,6 +114,7 @@ final List<Kategori> kKategori = [
   Kategori(
     id: 5,
     name: 'Photo',
+    url: 'photo',
     image: Asset(
       link: "${Network.RANDOM_IMAGE_LINK}/45"
     )
@@ -116,6 +122,7 @@ final List<Kategori> kKategori = [
   Kategori(
     id: 6,
     name: 'Catering',
+    url: 'ketring',
     image: Asset(
       link: "${Network.RANDOM_IMAGE_LINK}/25"
     )

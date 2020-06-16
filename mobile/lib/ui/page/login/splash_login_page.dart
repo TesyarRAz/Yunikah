@@ -29,20 +29,7 @@ class SplashLoginPage extends StatelessWidget {
               textColor: Colors.white,
               child: Text('Login'),
               onPressed: () {
-                Navigator.of(context).pushNamed(ROUTE_LOGIN)
-                .then((_user) {
-                  User user = _user as User;
-                  if (user != null) {
-                    SharedPreferences.getInstance().then((pref) {
-                      pref.setString("username", user.username);
-                      pref.setString("password", user.password);
-                      pref.setString("name", user.name);
-                      pref.setString("token", user.token);
-                      
-                      Provider.of<AuthProvider>(context).value = user;
-                    });
-                  }
-                });
+                Navigator.of(context).pushNamed(ROUTE_LOGIN);
               },
             ),
             SizedBox(height: 50,),

@@ -1,11 +1,15 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:yunikah/constant/routes.dart';
 import 'package:yunikah/helper.dart';
 import 'package:yunikah/model/api_data.dart';
 import 'package:yunikah/model/produk.dart';
 import 'package:yunikah/network.dart';
+import 'package:yunikah/provider/auth_provider.dart';
+import 'package:yunikah/ui/component/component.dart';
 import 'package:yunikah/ui/page.dart';
 
 class DetailProdukPage extends StatefulWidget {
@@ -19,8 +23,9 @@ class DetailProdukPage extends StatefulWidget {
 
 class _DetailProdukPageState extends State<DetailProdukPage> with SingleTickerProviderStateMixin {
   final scaffoldState = GlobalKey<ScaffoldState>();
+
   AnimationController _bottomAnimation;
-  // DetailProduk _data;
+  DetailProduk _tersediaPilihan;
 
   @override
   void initState() {
@@ -64,39 +69,40 @@ class _DetailProdukPageState extends State<DetailProdukPage> with SingleTickerPr
                   children: <Widget>[
                     Row(
                       children: <Widget>[
-                        Row(
-                          children: <Widget>[
-                            CachedNetworkImage(
-                              imageUrl: widget.produk.mitra.image.link,
-                              imageBuilder: (_, imageProvider) => Hero(
-                                tag: widget.produk.mitra,
-                                child: CircleAvatar(
-                                  backgroundImage: imageProvider,
-                                  radius: 30,
-                                ),
-                              ),
+                        CachedNetworkImage(
+                          imageUrl: widget.produk.mitra.image.link,
+                          imageBuilder: (_, imageProvider) => Hero(
+                            tag: widget.produk.mitra,
+                            child: CircleAvatar(
+                              backgroundImage: imageProvider,
+                              radius: 30,
                             ),
-                            SizedBox(width: 20,),
+                          ),
+                        ),
+                        SizedBox(width: 20,),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: <Widget>[
                             Text(
-                              widget.produk.mitra.name.length > 20 ? widget.produk.mitra.name.substring(0, widget.produk.mitra.name.length % 20) : widget.produk.mitra.name,
+                              widget.produk.mitra.name.length > 10 ? widget.produk.mitra.name.substring(0, widget.produk.mitra.name.length % 20) : widget.produk.mitra.name,
                               style: Theme.of(context).textTheme.title,
+                            ),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.end,
+                              children: <Widget>[
+                                FlatButton(
+                                  shape: OutlineInputBorder(),
+                                  child: Text('Kunjungi Mitra'),
+                                  onPressed: () {
+                                    Navigator.of(context).push(
+                                      Routes.generatePage((_) => MitraPage(mitra: widget.produk.mitra))
+                                    );
+                                  },
+                                ),
+                              ],
                             )
                           ],
                         ),
-                        Expanded(
-                          child: Align(
-                            alignment: Alignment.centerRight,
-                            child: FlatButton(
-                              shape: OutlineInputBorder(),
-                              child: Text('Kunjungi Mitra'),
-                              onPressed: () {
-                                Navigator.of(context).push(
-                                  Routes.generatePage((_) => MitraPage(mitra: widget.produk.mitra))
-                                );
-                              },
-                            ),
-                          ),
-                        )
                       ],
                     ),
                     Divider(thickness: 2,),
@@ -219,37 +225,85 @@ class _DetailProdukPageState extends State<DetailProdukPage> with SingleTickerPr
         builder: (context) => FloatingActionButton(
           child: Icon(Icons.add_shopping_cart, color: Colors.white,),
           onPressed: () {
-            showDialog(
-              context: context,
-              builder: (context) => Dialog(
-                child: Helper.createLoading(),
-              )
-            );
+            var user = Provider.of<AuthProvider>(context, listen: false).value;
 
-            Network.instance.pesanProduk(widget.produk)
-            .then((success) {
-              Navigator.of(context).pop();
-              if (success) {
-                scaffoldState.currentState
-                ..hideCurrentSnackBar()
-                ..showSnackBar(
-                  SnackBar(
-                    content: Text('Berhasil Ditambah Ke Keranjang'),
-                  )
-                );
-              } else {
-                scaffoldState.currentState
-                ..hideCurrentSnackBar()
-                ..showSnackBar(
-                  SnackBar(
-                    content: Text('Gagal Ditambah Ke Keranjang'),
-                  )
-                );
-              }
-            });
+            if (user == null) {
+              showDialog(
+                context: context,
+                builder: (_) => AlertDialog(
+                  content: Text('Anda belum login, silahkan login terlebih dahulu'),
+                )
+              );
+
+              return;
+            }
+
+            showModalBottomSheet(
+              context: context,
+              builder: (context) => SizedBox.fromSize(
+                size: Size.fromHeight(300),
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: SingleChildScrollView(
+                    child: Padding(
+                      padding: const EdgeInsets.only(top: 20.0),
+                      child: widget.produk.type == ProdukType.TERSEDIA ? ProdukTersediaComponent(
+                        produk: widget.produk,
+                        onLoading: _pemesananOnLoading,
+                        onSuccess: _pemesananOnSuccess,
+                        onError: _pemesananOnError,
+                      ) : widget.produk.type == ProdukType.COMBO ? Container() : ProdukCustomComponent(
+                        produk: widget.produk,
+                        onLoading: _pemesananOnLoading,
+                        onSuccess: _pemesananOnSuccess,
+                        onError: _pemesananOnError,
+                      )
+                    ),
+                  ),
+                ),
+              ),
+              elevation: 20,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20))
+            );
           },
         ),
       ),
+    );
+  }
+
+  void _pemesananOnLoading() {
+    showDialog(
+      context: context,
+      builder: (context) => Dialog(
+        child: Helper.createLoading(),
+      )
+    );
+  }
+
+  Future _pemesananOnSuccess(bool success) {
+    if (success) {
+      return showDialog(
+        context: context,
+        builder: (_) => AlertDialog(
+          content: Text('Berhasil Ditambah Ke Keranjang'),
+        )
+      );
+    } else {
+      return showDialog(
+        context: context,
+        builder: (_) => AlertDialog(
+          content: Text('Gagal Ditambah Ke Keranjang'),
+        )
+      );
+    }
+  }
+
+  Future _pemesananOnError(Exception exception) {
+    return showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+        content: Text("Error"),
+      )
     );
   }
 
