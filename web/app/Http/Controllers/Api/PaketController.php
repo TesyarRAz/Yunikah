@@ -9,6 +9,12 @@ use App\Model\Paket;
 
 class PaketController extends Controller
 {
+    public function search(Request $request)
+    {
+        $data = Paket::where('name', 'rlike', $request->q)->paginate(10);
+
+        return response($data, 200);
+    }
     /**
      * Display a listing of the resource.
      *

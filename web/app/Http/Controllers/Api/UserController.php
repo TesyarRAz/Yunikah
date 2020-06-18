@@ -17,6 +17,30 @@ class UserController extends Controller
 		return response(auth()->user(), 200);
 	}
 
+    public function register(Request $request)
+    {
+        $request->validate([
+            'name' => 'required',
+            'phone' => 'required',
+            'email' => 'required|email',
+            'username' => 'required|min:5|',
+            'password' => 'required|min:5'
+        ]);
+
+        if (User::where('username', $request->username)->orWhere('email', $request->email)->count() > 0)
+        {
+            return response(['message' => 'email sudah ada'], 401);
+        }
+
+        $request->replace(['password' => Hash::make($request->password)]);
+
+        User::create($request->only([
+            'name', 'phone', 'email', 'username'
+        ]));
+
+        return response(['message' => 'Berhasil'], 200);
+    }
+
     public function post(Request $request)
     {
         $request->validate([

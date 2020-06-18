@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class PemesananProduk extends Model
 {
     protected $guarded = ['id'];
-    protected $with = ['status', 'produk'];
+    protected $with = ['status', 'produk', 'pilihan'];
 
     public function produk()
     {
@@ -22,5 +22,10 @@ class PemesananProduk extends Model
     public function status()
     {
     	return $this->belongsTo('App\Model\StatusPemesanan', 'status_pemesanan_id');
+    }
+
+    public function pilihan()
+    {
+        return $this->belongsTo('App\Model\PilihanProduk', 'pilihan_produk_id');
     }
 }
