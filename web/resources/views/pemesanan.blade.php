@@ -14,13 +14,17 @@
 
     <div class="row align-items-center">
         <div class="col-12 mx-auto">
-            <table class="table table-stripped table-white table-bordered">
+            <table class="table table-stripped table-white table-bordered table-responsive-sm">
                 <thead class="bg-dark text-white">
                     <tr>
                         <th>#</th>
                         <th>Nama Pemesan</th>
+                        @if ($type == 'produk')
                         <th>Produsen</th>
                         <th>Produk</th>
+                        @else
+                        <th>Paket</th>
+                        @endif
                         <th>Total Biaya</th>
                         <th>No.Telp</th>
                         <th>Opsi</th>
@@ -33,8 +37,12 @@
                         <tr>
                             <td>{{ $i++ }}</td>
                             <td>{{ $d->user->name }}</td>
+                            @if ($type == 'produk')
                             <td>{{ $d->produk->mitra->name }}</td>
                             <td>{{ $d->produk->name }}</td>
+                            @else
+                            <td>{{ $d->paket->name }}</td>
+                            @endif
                             <td>Rp. {{ number_format($d->harga, 2, ',', '.') }}</td>
                             <td>{{ $d->user->phone }}</td>
                             <td>

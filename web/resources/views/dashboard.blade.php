@@ -64,22 +64,22 @@ use App\Model\PemesananPaket;
                             <tr>
                                 <td>Dikirim</td>
                                 <td>:</td>
-                                <td>{{ PemesananPaket::where('status_pemesanan_id', 1)->count() }}</td>
+                                <td>{{ PemesananPaket::where('status_pemesanan_id', 2)->count() }}</td>
                             </tr>
                             <tr>
                                 <td>Dikonfirmasi</td>
                                 <td>:</td>
-                                <td>{{ PemesananPaket::where('status_pemesanan_id', 2)->count() }}</td>
+                                <td>{{ PemesananPaket::where('status_pemesanan_id', 3)->count() }}</td>
                             </tr>
                             <tr>
                                 <td>Diproses</td>
                                 <td>:</td>
-                                <td>{{ PemesananPaket::where('status_pemesanan_id', 3)->count() }}</td>
+                                <td>{{ PemesananPaket::where('status_pemesanan_id', 4)->count() }}</td>
                             </tr>
                             <tr>
                                 <td>Selesai</td>
                                 <td>:</td>
-                                <td>{{ PemesananPaket::where('status_pemesanan_id', 4)->count() }}</td>
+                                <td>{{ PemesananPaket::where('status_pemesanan_id', 5)->count() }}</td>
                             </tr>
                         </table>
 
@@ -90,22 +90,22 @@ use App\Model\PemesananPaket;
                             <tr>
                                 <td>Dikirim</td>
                                 <td>:</td>
-                                <td>{{ PemesananProduk::where('status_pemesanan_id', 1)->count() }}</td>
+                                <td>{{ PemesananProduk::where('status_pemesanan_id', 2)->count() }}</td>
                             </tr>
                             <tr>
                                 <td>Dikonfirmasi</td>
                                 <td>:</td>
-                                <td>{{ PemesananProduk::where('status_pemesanan_id', 2)->count() }}</td>
+                                <td>{{ PemesananProduk::where('status_pemesanan_id', 3)->count() }}</td>
                             </tr>
                             <tr>
                                 <td>Diproses</td>
                                 <td>:</td>
-                                <td>{{ PemesananProduk::where('status_pemesanan_id', 3)->count() }}</td>
+                                <td>{{ PemesananProduk::where('status_pemesanan_id', 4)->count() }}</td>
                             </tr>
                             <tr>
                                 <td>Selesai</td>
                                 <td>:</td>
-                                <td>{{ PemesananProduk::where('status_pemesanan_id', 4)->count() }}</td>
+                                <td>{{ PemesananProduk::where('status_pemesanan_id', 5)->count() }}</td>
                             </tr>
                         </table>
                     </div>

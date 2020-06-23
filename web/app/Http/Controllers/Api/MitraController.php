@@ -10,6 +10,13 @@ use App\Model\Produk;
 
 class MitraController extends Controller
 {
+    public function search(Request $request)
+    {
+        $data = Mitra::where('name', 'rlike', $request->q)->paginate(10);
+
+        return response($data, 200);
+    }
+
     /**
      * Display a listing of the resource.
      *

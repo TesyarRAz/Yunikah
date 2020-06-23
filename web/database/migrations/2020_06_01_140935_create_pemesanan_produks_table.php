@@ -19,6 +19,7 @@ class CreatePemesananProduksTable extends Migration
             $table->foreignId('user_id')->constrained();
             $table->foreignId('status_pemesanan_id')->constrained();
             $table->foreignId('produk_id')->constrained();
+            $table->foreignId('pilihan_produk_id')->nullable()->constrained();
 
             $table->longText('alamat');
             $table->date('tanggal_pernikahan');

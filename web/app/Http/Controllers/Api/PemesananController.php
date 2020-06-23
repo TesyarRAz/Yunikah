@@ -15,14 +15,14 @@ class PemesananController extends Controller
 {
     public function show_pemesanan_produk()
     {
-        $data = auth()->user()->pemesanan_produk()->paginate(10);
+        $data = auth()->user()->pemesanan_produk;
 
         return response($data, 200);
     }
 
     public function show_pemesanan_paket()
     {
-        $data = auth()->user()->pemesanan_paket()->paginate(10);
+        $data = auth()->user()->pemesanan_paket;
 
         return response($data, 200);
     }
@@ -44,10 +44,11 @@ class PemesananController extends Controller
                 'alamat' => '',
                 'harga' => $pilihan_produk->harga,
                 'tanggal_pernikahan' => now(),
-                'kuantitas' => 1
+                'kuantitas' => 1,
+                'pilihan_produk_id' => $pilihan_produk->id
             ]);
         }
-        else if ($kategori->type == 'custom')
+        else if ($produk->type == 'custom')
         {
             $this->validate($request, [
                 'kuantitas' => 'required|numeric'
@@ -64,7 +65,7 @@ class PemesananController extends Controller
                 'kuantitas' => $request->kuantitas
             ]);
         }
-        else if ($kategori->type == 'combo')
+        else if ($produk->type == 'combo')
         {
             if (!empty($request->kuantitas))
             {
@@ -117,53 +118,69 @@ class PemesananController extends Controller
     	return response(['message' => 'Berhasil masukan keranjang'], 200);
     }
 
-    public function checkout_produk(Request $request, Produk $produk)
+    public function checkout_produk(Request $request, PemesananProduk $pemesanan)
     {
     	$request->validate([
 			'alamat' => 'required',
             'tanggal_pernikahan' => 'required|date'
     	]);
 
-    	$pemesanans = auth()->user()->pemesanan_produk()
-    	// Menggunakan Default Keranjang Dengan ID 1
-    	->where('status_pemesanan_id', 1)
-    	->where('produk_id', $produk->id)
-    	->get();
+    	if ($pemesanan->user_id != auth()->id())
+        {
+            return response([], 401);
+        }
 
-    	foreach ($pemesanans as $pemesanan)
-    	{
-    		$pemesanan->status_pemesanan_id = 2;
-    		$pemesanan->tanggal_pernikahan = $request->tanggal_pernikahan;
-    		$pemesanan->alamat = $request->alamat;
+        if ($pemesanan->status_pemesanan_id != 1)
+        {
+            return response([], 401);
+        }
 
-    		$pemesanan->save();
-    	}
+    	$pemesanan->status_pemesanan_id = 2;
+        $pemesanan->tanggal_pernikahan = $request->tanggal_pernikahan;
+        $pemesanan->alamat = $request->alamat;
+
+        $pemesanan->save();
 
     	return response(['message' => 'Berhasil Checkout'], 200);
     }
 
-    public function checkout_paket(Request $request, Paket $paket)
+    public function checkout_paket(Request $request, PemesananPaket $pemesanan)
     {
     	$request->validate([
 			'alamat' => 'required',
             'tanggal_pernikahan' => 'required|date'
     	]);
 
-    	$pakets = auth()->user()->pemesanan_paket()
-    	// Menggunakan Default Keranjang Dengan ID 1
-    	->where('status_pemesanan_id', 1)
-    	->where('paket_id', $paket->id)
-    	->get();
+        if ($pemesanan->user_id != auth()->id())
+        {
+            return response([], 401);
+        }
 
-    	foreach ($pakets as $paket)
-    	{
-    		$paket->status_pemesanan_id = 2;
-    		$paket->tanggal_pernikahan = $request->tanggal_pernikahan;
-    		$paket->alamat = $request->alamat;
+        if ($pemesanan->status_pemesanan_id != 1)
+        {
+            return response([], 401);
+        }
 
-    		$paket->save();
-    	}
+    	$pemesanan->status_pemesanan_id = 2;
+        $pemesanan->tanggal_pernikahan = $request->tanggal_pernikahan;
+        $pemesanan->alamat = $request->alamat;
+
+        $pemesanan->save();
 
     	return response(['message' => 'Berhasil Checkout'], 200);
+    }
+
+    public function hapus_produk(Request $request, PemesananProduk $pemesanan)
+    {
+        $pemesanan->delete();
+
+        return response(['message' => 'Berhasil dihapus'], 200);
+    }
+
+    public function hapus_paket(Request $request, PemesananPaket $pemesanan)
+    {
+        $pemesanan->delete();
+
+        return response(['message' => 'Berhasil dihapus'], 200);
     }
 }

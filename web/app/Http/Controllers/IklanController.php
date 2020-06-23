@@ -9,6 +9,8 @@ use App\Http\Requests\IklanRequest;
 use App\Model\Iklan;
 use App\Model\Asset;
 
+use Str;
+
 class IklanController extends Controller
 {
     /**

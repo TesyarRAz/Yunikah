@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html class="h-100">
 <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
 	<title>{{ config('app.name') }}</title>
 	<link rel="stylesheet" type="text/css" href="{{ asset('assets/bootstrap/css/bootstrap.min.css') }}">
 </head>

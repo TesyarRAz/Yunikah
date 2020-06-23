@@ -10,6 +10,12 @@ use App\Model\Produk;
 
 class ProdukController extends Controller
 {
+    public function search(Request $request)
+    {
+        $data = Produk::where('name', 'rlike', $request->q)->paginate(10);
+
+        return response($data, 200);
+    }
     /**
      * Display a listing of the resource.
      *

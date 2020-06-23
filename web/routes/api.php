@@ -17,14 +17,20 @@ use Illuminate\Support\Facades\Route;
 Route::namespace('Api')->group(function() {
 	Route::prefix('/auth')->group(function() {
 		Route::post('/login', 'UserController@post');
+		Route::post('/register', 'UserController@register');
 		
 		Route::middleware('auth:api')->group(function() {
 			Route::get('/user', 'UserController@index');
+			Route::post('/update', 'UserController@update');
+			Route::post('/logout', 'UserController@logout');
+			Route::post('/changepassword', 'UserController@change_password');
 		});
 	});
 
+	Route::get('/produk/search', 'ProdukController@search');
 	Route::prefix('/produk/{kategori:name}/')->group(function() {
 		Route::get('/', 'ProdukController@index');
+
 		Route::get('/{produk:id}', 'ProdukController@show');
 	});
 
@@ -35,11 +41,15 @@ Route::namespace('Api')->group(function() {
 
 	Route::prefix('/paket')->group(function() {
 		Route::get('/', 'PaketController@index');
+		Route::get('/search', 'PaketController@search');
+
 		Route::get('/{id}', 'PaketController@show');
 	});
 
 	Route::prefix('/mitra')->group(function() {
 		Route::get('/', 'MitraController@index');
+		Route::get('/search', 'MitraController@search');
+		
 		Route::get('/{id}', 'MitraController@show');
 		Route::get('/{id}/produk', 'MitraController@produk');
 	});
@@ -51,7 +61,10 @@ Route::namespace('Api')->group(function() {
 		Route::get('/produk', 'PemesananController@show_pemesanan_produk');
 		Route::get('/paket', 'PemesananController@show_pemesanan_paket');
 
-		Route::post('/produk/checkout/{produk}', 'PemesananController@checkout_produk');
-		Route::post('/paket/checkout/{paket}', 'PemesananController@checkout_paket');
+		Route::post('/produk/checkout/{pemesanan}', 'PemesananController@checkout_produk');
+		Route::post('/paket/checkout/{pemesanan}', 'PemesananController@checkout_paket');
+
+		Route::delete('/produk/{pemesanan}', 'PemesananController@hapus_produk');
+		Route::delete('/paket/{pemesanan}', 'PemesananController@hapus_paket');
 	});
 });

@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class Paket extends Model
 {
     protected $guarded = ['id'];
-    protected $with = ['image'];
+    protected $with = ['image', 'details'];
 
     public function image()
     {
