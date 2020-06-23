@@ -2,10 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:yunikah/provider/auth_provider.dart';
-import 'package:yunikah/ui/page/home/home_page.dart';
-import 'package:yunikah/ui/page/keranjang/keranjang_page.dart';
-import 'package:yunikah/ui/page/login/splash_login_page.dart';
-import 'package:yunikah/ui/page/profile/profile_page.dart';
+import 'package:yunikah/ui/page.dart';
 
 class MenuPage extends StatefulWidget {
   @override
@@ -52,21 +49,26 @@ class _MenuPageState extends State<MenuPage> {
     );
   }
 
-  List<Widget> _buildTabs() => [
-    HomePage(
-      key: PageStorageKey('home'),
-    ),
-    Provider.of<AuthProvider>(context).isAuthorized ? KeranjangPage(
-      key: PageStorageKey('keranjang'),
-    ) : SplashLoginPage(
-      key: PageStorageKey('splash_login'),
-    ),
-    Provider.of<AuthProvider>(context).isAuthorized ? ProfilePage(
-      key: PageStorageKey('profile')
-    ) : SplashLoginPage(
-      key: PageStorageKey('splash_login'),
-    )
-  ];
+  List<Widget> _buildTabs() {
+    var auth = Provider.of<AuthProvider>(context);
+
+    return [
+      HomePage(
+        key: PageStorageKey('home'),
+      ),
+      auth.isAuthorized ? KeranjangPage(
+        key: PageStorageKey('keranjang'),
+      ) : SplashLoginPage(
+        key: PageStorageKey('splash_login'),
+      ),
+      auth.isAuthorized ? ProfilePage(
+        key: PageStorageKey('profile'),
+        onRestart: () => setState(() {}),
+      ) : SplashLoginPage(
+        key: PageStorageKey('splash_login'),
+      )
+    ];
+  }
 
   Widget _bottomNav() {
     return BottomNavigationBar(

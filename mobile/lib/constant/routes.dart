@@ -27,7 +27,7 @@ class Routes {
     return PageRouteBuilder(
       pageBuilder: (context, animation, _) => builder(context),
       transitionsBuilder: (context, animation, animationExit, _) => FadeTransition(
-        opacity: animation,
+        opacity: animation ?? animationExit,
         child: builder(context),
       ),
       transitionDuration: Duration(milliseconds: 500),

@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:yunikah/ui/component/component.dart';
 
 class Helper {
-  static Widget createLoading() => Padding(
-    padding: const EdgeInsets.all(18.0),
-    child: Row(
-      children: [
-        CircularProgressIndicator(),
-        SizedBox(width: 20,),
-        Text('Sedang Meloading...')
-      ],
-    ),
-  );
+  static showLoading(BuildContext context) {
+    return showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (_) => Dialog(
+        child: LoadingComponent(),
+      )
+    );
+  }
 }

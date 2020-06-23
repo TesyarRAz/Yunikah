@@ -2,10 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:yunikah/constant/routes.dart';
-import 'package:yunikah/model/api_data.dart';
-import 'package:yunikah/model/produk.dart';
-import 'package:yunikah/model/mitra.dart';
-import 'package:yunikah/model/paket.dart';
+import 'package:yunikah/model/model.dart';
 import 'package:yunikah/network.dart';
 import 'package:yunikah/provider/network_provider.dart';
 import 'package:yunikah/ui/page.dart';
@@ -38,31 +35,39 @@ class _HomePageState extends State<HomePage> {
     return Scaffold(
       body: SafeArea(
         top: false,
-        child: RefreshIndicator(
-          onRefresh: () async {
-            PageStorage.of(context).writeState(context, null, identifier: 'data');
-
-            setState(() {
-              
-            });
-          },
-          child: FutureBuilder(
-            future: _getData(),
-            builder: (context, snapshot) {
-              if (snapshot.connectionState == ConnectionState.waiting) 
-                return Center(
-                  child: CircularProgressIndicator(),
-                );
-              else if (snapshot.connectionState == ConnectionState.done && snapshot.hasData)
+        child: FutureBuilder(
+          future: _getData(),
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) 
+              return Center(
+                child: CircularProgressIndicator(),
+              );
+            else if (snapshot.connectionState == ConnectionState.done) {
+              if (snapshot.hasData)
                 return _buildBody(
                   snapshot.data
                 );
 
               return Center(
-                child: Text('Tidak Ada Koneksi Internet'),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                    Text('Tidak ada data'),
+                    FlatButton(
+                      onPressed: () => setState(() {
+                        PageStorage.of(context).writeState(context, null, identifier: 'home_data');
+                      }),
+                      child: Text('Refresh'),
+                    )
+                  ],
+                )
               );
-            },
-          ),
+            }
+
+            return Center(
+              child: Text('Tidak Ada Koneksi Internet'),
+            );
+          },
         ),
       ),
     );
@@ -70,17 +75,24 @@ class _HomePageState extends State<HomePage> {
 
   Widget _buildBody(Map<String, dynamic> data) => ScrollConfiguration(
     behavior: ScrollBehavior(),
-    child: SingleChildScrollView(
-      controller: _mainScroll,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          IklanComponent(data['iklan']),
-          _buildHeader(),
-          _buildKategori(),
-          _buildPaket(data['paket']),
-          _buildMitra(data['mitra'])
-        ],
+    child: RefreshIndicator(
+      onRefresh: () async {
+        setState(() {
+          PageStorage.of(context).writeState(context, null, identifier: 'home_data');
+        });
+      },
+      child: SingleChildScrollView(
+        controller: _mainScroll,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            IklanComponent(data['iklan']),
+            _buildHeader(),
+            _buildKategori(),
+            _buildPaket(data['paket']),
+            _buildMitra(data['mitra'])
+          ],
+        ),
       ),
     ),
   );
@@ -166,7 +178,6 @@ class _HomePageState extends State<HomePage> {
     child: Card(
       child: InkWell(
         onTap: () {
-          print(kategori.url);
           Navigator.of(context).push(
             MaterialPageRoute(
               builder: (_) => ProdukPage(kategori: kategori)
@@ -354,9 +365,9 @@ class _HomePageState extends State<HomePage> {
   );
 
   Future<Map<String, dynamic>> _getData() async {
-    _cacheData = PageStorage.of(context).readState(context, identifier: 'data');
+    _cacheData = PageStorage.of(context).readState(context, identifier: 'home_data');
     if (_cacheData == null) {
-      return Future.wait([
+      return await Future.wait([
         Network.instance.allIklan(1),
         Network.instance.allPaket(1),
         Network.instance.allMitra(1)
@@ -372,7 +383,7 @@ class _HomePageState extends State<HomePage> {
         Provider.of<PaketProvider>(context, listen: false).value = value[1];
         Provider.of<MitraProvider>(context, listen: false).value = value[2];
         
-        PageStorage.of(context).writeState(context, _cacheData, identifier: 'data');
+        PageStorage.of(context).writeState(context, _cacheData, identifier: 'home_data');
 
         return _cacheData;
       });

@@ -45,6 +45,7 @@ class Produk {
   int harga;
   String name;
   String keterangan;
+  int transaksi;
 
   Mitra mitra;
   Asset image;
@@ -61,7 +62,8 @@ class Produk {
     this.image, 
     this.type, 
     this.kategori, 
-    this.data
+    this.data,
+    this.transaksi
   });
 
   factory Produk.parseFromJson(Map<String, dynamic> data) => Produk(
@@ -72,7 +74,8 @@ class Produk {
     image: Asset.parseFromJson(data['image']),
     type: data['type'] == "tersedia" ? ProdukType.TERSEDIA : data['type'] == "pilihan" ? ProdukType.COMBO : ProdukType.CUSTOM,
     mitra: Mitra.parseFromJson(data['mitra']),
-    data: data['pilihans'] == null ? null : (data['pilihans'] as List<dynamic>).map((json) => DetailProduk.parseFromJson(json)).toList()
+    data: data['pilihans'] == null ? null : (data['pilihans'] as List<dynamic>).map((json) => DetailProduk.parseFromJson(json)).toList(),
+    transaksi: data['total_transaksi']
   );
 }
 

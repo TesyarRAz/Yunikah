@@ -1,4 +1,11 @@
+import 'dart:async';
+
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:yunikah/constant/routes.dart';
+import 'package:yunikah/model/model.dart';
+import 'package:yunikah/network.dart';
+import 'package:yunikah/ui/page.dart';
 
 class SearchPage extends StatefulWidget {
   @override
@@ -7,7 +14,9 @@ class SearchPage extends StatefulWidget {
 
 class _SearchPageState extends State<SearchPage> {
   TextEditingController _searchText;
+
   List<Widget> _searchData;
+  bool _searchLoading = false;
 
   @override
   void initState() {
@@ -20,33 +29,132 @@ class _SearchPageState extends State<SearchPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: SafeArea(
-        child: SingleChildScrollView(
-          child: Column(
-            children: <Widget>[
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: TextFormField(
-                  controller: _searchText,
-                  decoration: InputDecoration(
-                    border: OutlineInputBorder(),
-                    contentPadding: EdgeInsets.only(left: 18),
-                    labelText: 'Pencarian',
-                    suffixIcon: IconButton(
-                      icon: Icon(Icons.search),
-                      onPressed: () {
-                        
-                      },
-                      // onPressed: _search
-                    )
-                  ),
+        child: Column(
+          children: <Widget>[
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: TextFormField(
+                controller: _searchText,
+                decoration: InputDecoration(
+                  border: OutlineInputBorder(),
+                  contentPadding: EdgeInsets.only(left: 18),
+                  labelText: 'Pencarian',
+                  suffixIcon: IconButton(
+                    icon: Icon(Icons.search),
+                    onPressed: _search,
+                  )
                 ),
               ),
-            ]..addAll(_searchData ?? [Container()]),
-          ),
+            ),
+            _searchData != null ? SingleChildScrollView(
+              child: Column(
+                children: _searchData,
+              ),
+            ) : _searchLoading ? Center(child: CircularProgressIndicator(),) : Container()
+          ],
         ),
       ),
     );
   }
+
+  void _search() {
+    if (_searchText.text.length < 1) return;
+
+    setState(() {
+      _searchLoading = true;
+    });
+
+    Network.instance.search(_searchText.text)
+    .then((value) {
+      var mitra = value[0];
+      var paket = value[1];
+      var produk = value[2];
+
+      var result = <Widget>[];
+
+      if (mitra.data.length > 0) {
+        result.add(_buildItemSearch(mitra.data, {
+          'title' : 'Mitra',
+          'generate_page': (Mitra m) => MitraPage(mitra: m,)
+        }));
+      }
+
+      if (paket.data.length > 0) {
+        result.add(_buildItemSearch(paket.data, {
+          'title' : 'Paket',
+          'generate_page': (Paket m) => PaketPage(paket: m,)
+        }));
+      }
+
+      if (produk.data.length > 0) {
+        result.add(_buildItemSearch(produk.data, {
+          'title' : 'Produk',
+          'generate_page' : (Produk m) => DetailProdukPage(produk: m,)
+        }));
+      }
+
+      print(produk.data.length);
+
+      setState(() {
+        _searchData = result;
+        _searchLoading = false;
+      });
+    });
+  }
+
+  Widget _buildItemSearch(List<dynamic> data, Map<String, dynamic> config) => Padding(
+    padding: const EdgeInsets.all(8.0),
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: <Widget>[
+        Text(
+          config['title'],
+          style: Theme.of(context).textTheme.title,
+        ),
+        GridView.count(
+          physics: NeverScrollableScrollPhysics(),
+          shrinkWrap: true,
+          crossAxisCount: 2,
+          children: data.map((m) => Card(
+            child: InkWell(
+              onTap: () {
+                Navigator.of(context).push(
+                  Routes.generatePage((_) => config['generate_page'](m))
+                );
+              },
+              child: Column(
+                children: <Widget>[
+                  Expanded(
+                    child: CachedNetworkImage(
+                      imageUrl: m.image.link,
+                      imageBuilder: (_, imageProvider) => Hero(
+                        tag: m,
+                        child: Container(
+                          decoration: BoxDecoration(
+                            image: DecorationImage(
+                              image: imageProvider,
+                              fit: BoxFit.cover
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Text(
+                      m.name,
+                      style: Theme.of(context).textTheme.subtitle,
+                    ),
+                  )
+                ],
+              ),
+            ),
+          )).toList(),
+        )
+      ],
+    ),
+  );
 
 //   void _search() {
 //     setState(() {

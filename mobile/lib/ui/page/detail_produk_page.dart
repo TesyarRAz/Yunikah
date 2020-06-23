@@ -131,9 +131,9 @@ class _DetailProdukPageState extends State<DetailProdukPage> with SingleTickerPr
                         Expanded(
                           child: Column(
                             children: <Widget>[
-                              Text('Rating'),
+                              Text('Transaksi'),
                               Text(
-                                '5.0',
+                                widget.produk.transaksi?.toString() ?? "0",
                                 style: Theme.of(context).textTheme.subhead,
                               )
                             ],
@@ -225,9 +225,9 @@ class _DetailProdukPageState extends State<DetailProdukPage> with SingleTickerPr
         builder: (context) => FloatingActionButton(
           child: Icon(Icons.add_shopping_cart, color: Colors.white,),
           onPressed: () {
-            var user = Provider.of<AuthProvider>(context, listen: false).value;
+            var auth = Provider.of<AuthProvider>(context, listen: false);
 
-            if (user == null) {
+            if (!auth.isAuthorized) {
               showDialog(
                 context: context,
                 builder: (_) => AlertDialog(
@@ -272,12 +272,7 @@ class _DetailProdukPageState extends State<DetailProdukPage> with SingleTickerPr
   }
 
   void _pemesananOnLoading() {
-    showDialog(
-      context: context,
-      builder: (context) => Dialog(
-        child: Helper.createLoading(),
-      )
-    );
+    Helper.showLoading(context);
   }
 
   Future _pemesananOnSuccess(bool success) {
@@ -318,29 +313,29 @@ class _DetailProdukPageState extends State<DetailProdukPage> with SingleTickerPr
             )
           );
         },
-        child: Padding(
-          padding: const EdgeInsets.all(10.0),
-          child: Column(
-            children: [
-              Expanded(
-                child: CachedNetworkImage(
-                  imageUrl: produk.image.link,
-                  imageBuilder: (context, imageProvider) => Container(
-                    decoration: BoxDecoration(
-                      image: DecorationImage(
-                        image: imageProvider,
-                        fit: BoxFit.cover
-                      ),
-                    )
-                  ),
-                )
-              ),
-              Text(
+        child: Column(
+          children: [
+            Expanded(
+              child: CachedNetworkImage(
+                imageUrl: produk.image.link,
+                imageBuilder: (context, imageProvider) => Container(
+                  decoration: BoxDecoration(
+                    image: DecorationImage(
+                      image: imageProvider,
+                      fit: BoxFit.cover
+                    ),
+                  )
+                ),
+              )
+            ),
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Text(
                 produk.name,
                 style: Theme.of(context).textTheme.subtitle,
-              )
-            ]
-          ),
+              ),
+            )
+          ]
         ),
       ),
     ),

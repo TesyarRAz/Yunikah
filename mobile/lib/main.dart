@@ -1,9 +1,9 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:yunikah/constant/routes.dart';
-import 'package:yunikah/model/user.dart';
 import 'package:yunikah/network.dart';
 import 'package:yunikah/provider/auth_provider.dart';
 import 'package:yunikah/provider/network_provider.dart';
@@ -22,40 +22,24 @@ class YunikahApp extends StatelessWidget {
 
     return MultiProvider(
       providers: [
-        FutureProvider<User>(
-          initialData: null,
-          create: (context) async {
-            var prefs = await SharedPreferences.getInstance();
+        FutureProvider.value(
+          initialData: AuthProvider(null),
+          value: SharedPreferences.getInstance().then((prefs) async {
+            if (prefs.containsKey("token")) {
+              return await Network.instance.userData(prefs.getString("token"))
+              .then((user) {
+                if (user == null) {
+                  prefs.clear();
+                }
 
-            if (prefs.get("token") != null) {
-              var user = await Network.instance.userData(prefs.getString("token"));
+                user.token = prefs.getString("token");
 
-              if (user == null) {
-                prefs.clear();
-              }
-
-              return user;
-            }
-
-            return null;
-          },
-        ),
-        FutureProvider(
-          create: (context) async {
-            var prefs = await SharedPreferences.getInstance();
-
-            if (prefs.get("token") != null) {
-              var user = await Network.instance.userData(prefs.getString("token"));
-
-              if (user == null) {
-                prefs.clear();
-              }
-
-              return AuthProvider(user);
+                return AuthProvider(user);
+              });
             }
 
             return AuthProvider(null);
-          },
+          }),
         ),
         ChangeNotifierProvider.value(
           value: IklanProvider(null),

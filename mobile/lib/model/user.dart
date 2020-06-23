@@ -20,6 +20,7 @@ class User {
   String password;
   String phone;
   String alamat;
+  String email;
 
   // For Authentication
   String token;
@@ -34,12 +35,14 @@ class User {
     this.phone,
     this.alamat,
     this.token,
-    this.statusUser
+    this.statusUser,
+    this.email
   });
 
   factory User.parseFromJson(Map<String, dynamic> data) => User(
     id: data['id'],
     name: data['name'],
+    email: data['email'],
     username: data['username'],
     phone: data['phone'],
     alamat: data['alamat'],

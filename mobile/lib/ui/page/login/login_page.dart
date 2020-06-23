@@ -77,13 +77,7 @@ class _LoginPageState extends State<LoginPage> {
                 textColor: Colors.white,
                 child: Text('Masuk'),
                 onPressed: () {
-                  showDialog(
-                    context: context,
-                    builder: (_) => Dialog(
-                      child: Helper.createLoading(),
-                    ),
-                    barrierDismissible: false
-                  );
+                  Helper.showLoading(context);
 
                   Network.instance.login(_textUsername.text, _textPassword.text)
                   .then((user) {

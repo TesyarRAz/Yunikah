@@ -40,14 +40,14 @@ class SplashLoginPage extends StatelessWidget {
                   'Belum punya akun?',
                   style: Theme.of(context).textTheme.overline,
                 ),
-                GestureDetector(
+                FlatButton(
                   child: Text(
                     'Daftar',
                     style: Theme.of(context).textTheme.overline.apply(
                       color: Colors.blue
                     ),
                   ),
-                  onTap: () {
+                  onPressed: () {
                     Navigator.of(context).pushNamed(ROUTE_REGISTER)
                     .then((_user) {
                       User user = _user as User;
