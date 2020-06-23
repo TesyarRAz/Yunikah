@@ -35,7 +35,7 @@
         </tr>
         <tr>
             <td colspan="3">
-                <button class="btn btn-primary" onclick="kerjakan()">Kerjakan</button>
+                <button id="kerjakan" class="btn btn-primary">Kerjakan</button>
             </td>
         </tr>
         <tr>
@@ -47,23 +47,30 @@
 </div>
 
 <script type="text/javascript">
-    var link = document.getElementById('link');
-    var data = document.getElementById('data');
-    var token = document.getElementById('token');
-    var result = document.getElementById('result');
-    var method = document.getElementById('method')
+    (function() {
+        let csrf_token = document.querySelector('meta[name=csrf-token]').content;
+        let link = document.querySelector('#link');
+        let data = document.querySelector('#data');
+        let token = document.querySelector('#token');
+        let result = document.querySelector('#result');
+        let method = document.querySelector('#method')
+        let kerjakan = document.querySelector('#kerjakan');
 
-    async function kerjakan() {
-        let input = {
-            method: method.value
+        kerjakan.onclick = () => {
+            let input = {
+                method: method.value,
+                header: {
+                    '_token' : csrf_token
+                }
+            }
+
+            if (data.value.length > 0) input.body = data.value;
+            if (token.value.length > 0) input.header['Authorization'] = 'Bearer ' + token.value;
+
+            fetch(link.value, input)
+            .then(e => e.text())
+            .then(e => result.value = e);
         }
-
-        if (data.value.length > 0) input.data = data.value;
-        if (token.value.length > 0) input.header['Authorization'] = 'Bearer ' + token.value;
-
-        await fetch(link.value, input)
-        .then(e => e.text())
-        .then(e => result.value = e);
-    }
+    })();
 </script>
 @endsection

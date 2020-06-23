@@ -32,11 +32,10 @@ class UserController extends Controller
             return response(['message' => 'email sudah ada'], 401);
         }
 
-        $request->replace(['password' => Hash::make($request->password)]);
-
-        User::create($request->only([
-            'name', 'phone', 'email', 'username'
-        ]));
+        $user = new User;
+        $user->fill($request->only(['name', 'phone', 'email', 'username']));
+        $user->password = Hash::make($request->password);
+        $user->save();
 
         return response(['message' => 'Berhasil'], 200);
     }
@@ -58,6 +57,39 @@ class UserController extends Controller
     	}
 
     	return response(['error' => 'username atau password salah'], 401);
+    }
+
+    public function update(Request $request)
+    {
+        $request->validate([
+            'name' => 'required',
+            'phone' => 'required'
+        ]);
+
+        auth()->user()->fill($request->only(['name', 'phone']));
+        auth()->user()->save();
+
+        return response(['message' => 'berhasil'], 401);
+    }
+
+    public function change_password(Request $request)
+    {
+        $request->validate([
+            'password' => 'required',
+            'new_password' => 'required|confirmed|min:5'
+        ]);
+
+        if (Hash::check($request->password, auth()->user()->password))
+        {
+            auth()->user()->password = Hash::make($request->new_password);
+            auth()->user()->save();
+
+            auth()->logout();
+
+            return response(['message' => 'success'], 200);
+        }
+
+        return response(['message' => 'Password Lama Salah'], 401);
     }
 
     public function logout()

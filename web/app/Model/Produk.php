@@ -9,7 +9,7 @@ use App\Model\PemesananProduk;
 class Produk extends Model
 {
     protected $guarded = ['id'];
-    protected $with = ['image', 'mitra'];
+    protected $with = ['image', 'mitra', 'pilihans'];
     protected $appends = ['total_transaksi'];
 
     public function kategori()

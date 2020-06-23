@@ -21,14 +21,17 @@ Route::namespace('Api')->group(function() {
 		
 		Route::middleware('auth:api')->group(function() {
 			Route::get('/user', 'UserController@index');
+			Route::post('/update', 'UserController@update');
+			Route::post('/logout', 'UserController@logout');
+			Route::post('/changepassword', 'UserController@change_password');
 		});
 	});
 
+	Route::get('/produk/search', 'ProdukController@search');
 	Route::prefix('/produk/{kategori:name}/')->group(function() {
 		Route::get('/', 'ProdukController@index');
-		Route::get('/{produk:id}', 'ProdukController@show');
 
-		Route::get('/search', 'ProdukController@search');
+		Route::get('/{produk:id}', 'ProdukController@show');
 	});
 
 	Route::prefix('/iklan')->group(function() {
@@ -38,9 +41,9 @@ Route::namespace('Api')->group(function() {
 
 	Route::prefix('/paket')->group(function() {
 		Route::get('/', 'PaketController@index');
-		Route::get('/{id}', 'PaketController@show');
-
 		Route::get('/search', 'PaketController@search');
+
+		Route::get('/{id}', 'PaketController@show');
 	});
 
 	Route::prefix('/mitra')->group(function() {

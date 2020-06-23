@@ -11,7 +11,7 @@
 	<h2 class="text-center">Daftar Iklan</h2>
     <div class="row align-items-center">
         <div class="col-12 mx-auto">
-        	<table class="table table-stripped table-white table-bordered">
+        	<table class="table table-stripped table-white table-bordered table-responsive-sm">
         		<thead class="bg-dark text-white">
         			<tr>
         				<th>#</th>

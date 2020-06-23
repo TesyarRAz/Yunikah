@@ -8,6 +8,8 @@ use App\Http\Requests\MitraRequest;
 
 use App\Model\Mitra;
 
+use Str;
+
 class MitraController extends Controller
 {
     /**
