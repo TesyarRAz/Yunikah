@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:yunikah/helper.dart';
 import 'package:yunikah/network.dart';
+import 'package:yunikah/provider/auth_provider.dart';
 
 class LoginPage extends StatefulWidget {
   final _formLoginState = GlobalKey<FormState>();
@@ -86,7 +89,13 @@ class _LoginPageState extends State<LoginPage> {
                   .then((user) {
                     Navigator.of(context).pop();
                     if (user != null) {
-                      Navigator.of(context).pop(user);
+                      SharedPreferences.getInstance().then((prefs) {
+                        prefs.setString("token", user.token);
+                        
+                        Provider.of<AuthProvider>(context).value = user;
+                      });
+
+                      Navigator.of(context).pop();
                     } else {
                       showDialog(
                         context: context,

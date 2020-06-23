@@ -18,7 +18,7 @@ class User {
   String name;
   String username;
   String password;
-  String telp;
+  String phone;
   String alamat;
 
   // For Authentication
@@ -31,7 +31,7 @@ class User {
     this.name,
     this.username,
     this.password,
-    this.telp,
+    this.phone,
     this.alamat,
     this.token,
     this.statusUser
@@ -41,7 +41,7 @@ class User {
     id: data['id'],
     name: data['name'],
     username: data['username'],
-    telp: data['telp'],
+    phone: data['phone'],
     alamat: data['alamat'],
     token: data['token'],
   );
