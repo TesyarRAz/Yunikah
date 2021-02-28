@@ -43,10 +43,16 @@ class IklanController extends Controller
      */
     public function store(IklanRequest $request)
     {
-        $iklan = new Iklan;
-        $iklan->fill($request->only(['name', 'keterangan']));
+        $iklan = Iklan::make($request->validate());
 
-        $this->fillAssetImage($iklan);
+        if ($request->image != null)
+        {
+            $asset = Asset::createNewFile($request->image, [
+                'type' => 'image'
+            ], 'assets/iklan');
+            
+            $iklan->image_id = $asset->id;
+        }
 
         $iklan->save();
 
@@ -84,9 +90,16 @@ class IklanController extends Controller
      */
     public function update(IklanRequest $request, Iklan $iklan)
     {
-        $iklan->fill($request->only(['name', 'keterangan']));
+        $iklan->fill($request->validate());
 
-        $this->fillAssetImage($iklan);
+        if ($request->image != null)
+        {
+            $asset = Asset::createNewFile($request->image, [
+                'type' => 'image'
+            ], 'assets/iklan');
+
+            $iklan->image_id = $asset->id;
+        }
 
         $iklan->save();
 
@@ -104,19 +117,5 @@ class IklanController extends Controller
         $iklan->delete();
 
         return redirect()->route('iklan.index')->with('status', 'Berhasil menghapus iklan');
-    }
-
-    private function fillAssetImage($model)
-    {
-        if (request()->hasFile('image') && request()->image->isValid())
-        {
-            $asset = Asset::create([
-                'name' => Str::random(50) . '.' . request()->image->getClientOriginalExtension(),
-                'type' => 'image'
-            ]);
-
-            $model->image_id = $asset->id;
-            request()->image->move(public_path('assets/images'), $asset->name);
-        }
     }
 }

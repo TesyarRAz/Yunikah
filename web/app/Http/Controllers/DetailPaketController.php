@@ -43,10 +43,7 @@ class DetailPaketController extends Controller
      */
     public function store(CreateDetailPaketRequest $request)
     {
-        $data = new DetailPaket;
-        $data->fill($request->only(['produk_id', 'paket_id']));
-
-        $data->save();
+        $data = DetailPaket::create($request->validate());
 
         return back()->with('status', 'Berhasil Menambahkan ke paket');
     }

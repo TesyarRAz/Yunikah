@@ -50,12 +50,16 @@ class ProdukController extends Controller
     {
         $request->merge(['mitra_id' => $mitra->id]);
 
-        $produk = new Produk;
-        $produk->fill(
-            $request->only(['name', 'harga', 'keterangan', 'type', 'kategori_id', 'mitra_id'])
-        );
+        $produk = Produk::make($request->all());
 
-        $this->fillAssetImage($produk);
+        if ($request->image != null)
+        {
+            $asset = Asset::createNewFile($request->image, [
+                'type' => 'image'
+            ], 'assets/produk');
+            
+            $produk->image_id = $asset->id;
+        }
 
         $produk->save();
 
@@ -86,13 +90,16 @@ class ProdukController extends Controller
      */
     public function update(ProdukRequest $request, Mitra $mitra, Produk $produk)
     {
-        $request->merge(['mitra_id' => $mitra->id]);
+        $produk->fill($request->all());
 
-        $produk->fill(
-            $request->only(['name', 'harga', 'keterangan', 'type', 'kategori_id', 'mitra_id'])
-        );
-
-        $this->fillAssetImage($produk);
+        if ($request->image != null)
+        {
+            $asset = Asset::createNewFile($request->image, [
+                'type' => 'image'
+            ], 'assets/produk');
+            
+            $produk->image_id = $asset->id;
+        }
 
         $produk->save();
 
@@ -114,19 +121,5 @@ class ProdukController extends Controller
         return redirect()
         ->route('produk.index', $mitra->id)
         ->with('status', 'Berhasil dihapus');
-    }
-
-    private function fillAssetImage($model)
-    {
-        if (request()->hasFile('image') && request()->image->isValid())
-        {
-            $asset = Asset::create([
-                'name' => Str::random(50) . '.' . request()->image->getClientOriginalExtension(),
-                'type' => 'image'
-            ]);
-
-            $model->image_id = $asset->id;
-            request()->image->move(public_path('assets/images'), $asset->name);
-        }
     }
 }

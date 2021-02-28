@@ -43,11 +43,16 @@ class PaketController extends Controller
      */
     public function store(PaketRequest $request)
     {
-        $paket = new Paket;
+        $paket = Paket::make($request->validate());
 
-        $paket->fill($request->only(['name', 'harga', 'keterangan']));
+        if ($request->image != null)
+        {
+            $asset = Asset::createNewFile($request->image, [
+                'type' => 'image'
+            ], 'assets/paket');
 
-        $this->fillAssetImage($paket);
+            $paket->image_id = $asset->id;
+        }
 
         $paket->save();
 
@@ -87,9 +92,16 @@ class PaketController extends Controller
      */
     public function update(PaketRequest $request, Paket $paket)
     {
-        $paket->fill($request->only(['name', 'harga', 'keterangan']));
+        $paket->fill($request->validate());
 
-        $this->fillAssetImage($paket);
+        if ($request->image != null)
+        {
+            $asset = Asset::createNewFile($request->image, [
+                'type' => 'image'
+            ], 'assets/paket');
+
+            $paket->image_id = $asset->id;
+        }
 
         $paket->save();
 
@@ -111,19 +123,5 @@ class PaketController extends Controller
         return redirect()
         ->route('paket.index')
         ->with('status', 'Berhasil hapus data');
-    }
-
-    private function fillAssetImage($model)
-    {
-        if (request()->hasFile('image') && request()->image->isValid())
-        {
-            $asset = Asset::create([
-                'name' => Str::random(50) . '.' . request()->image->getClientOriginalExtension(),
-                'type' => 'image'
-            ]);
-
-            $model->image_id = $asset->id;
-            request()->image->move(public_path('assets/images'), $asset->name);
-        }
     }
 }

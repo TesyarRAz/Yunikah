@@ -42,10 +42,16 @@ class MitraController extends Controller
      */
     public function store(MitraRequest $request)
     {
-        $mitra = new Mitra;
-        $mitra->fill($request->only(['name', 'alamat', 'keterangan']));
+        $mitra = Mitra::make($request->validate());
 
-        $this->fillAssetImage($mitra);
+        if ($request->image != null)
+        {
+            $asset = Asset::createNewFile($request->image, [
+                'type' => 'image'
+            ], 'assets/mitra');
+            
+            $mitra->image_id = $asset->id;
+        }
 
         $mitra->save();
 
@@ -85,9 +91,16 @@ class MitraController extends Controller
      */
     public function update(MitraRequest $request, Mitra $mitra)
     {
-        $mitra->fill($request->only(['name', 'alamat', 'keterangan']));
+        $mitra->fill($request->validate());
 
-        $this->fillAssetImage($mitra);
+        if ($request->image != null)
+        {
+            $asset = Asset::createNewFile($request->image, [
+                'type' => 'image'
+            ], 'assets/mitra');
+
+            $mitra->image_id = $asset->id;
+        }
 
         $mitra->save();
 
@@ -109,19 +122,5 @@ class MitraController extends Controller
         return redirect()
         ->route('mitra.index')
         ->with('status', 'Berhasil dihapus');
-    }
-
-    private function fillAssetImage($model)
-    {
-        if (request()->hasFile('image') && request()->image->isValid())
-        {
-            $asset = Asset::create([
-                'name' => Str::random(50) . '.' . request()->image->getClientOriginalExtension(),
-                'type' => 'image'
-            ]);
-
-            $model->image_id = $asset->id;
-            request()->image->move(public_path('assets/images'), $asset->name);
-        }
     }
 }

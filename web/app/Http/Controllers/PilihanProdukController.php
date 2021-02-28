@@ -44,10 +44,7 @@ class PilihanProdukController extends Controller
     {
         $request->merge(['produk_id' => $produk->id]);
 
-        $pilihan = new PilihanProduk;
-        $pilihan->fill($request->only(['name', 'keterangan', 'harga', 'produk_id']));
-
-        $pilihan->save();
+        $pilihan = PilihanProduk::create($request->all());
 
         return redirect()
         ->route('produk.pilihan.index', [$mitra->id, $produk->id])
@@ -85,8 +82,7 @@ class PilihanProdukController extends Controller
      */
     public function update(PilihanProdukRequest $request, Mitra $mitra, Produk $produk, PilihanProduk $pilihan)
     {
-        $pilihan->fill($request->only(['name', 'keterangan', 'harga']));
-        $pilihan->save();
+        $pilihan->update($request->all());
 
         return redirect()
         ->route('produk.pilihan.index', [$mitra->id, $produk->id])

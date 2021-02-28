@@ -35,14 +35,24 @@
 
 @section('content')
 <div class="container">
-    @if (Session::has('status'))
+    @if (session()->has('status'))
         <div class="alert alert-warning">
-            {{ Session::get('status') }}
+            {{ session('status') }}
         </div>
     @endif
 	<h2 class="text-center">Daftar Produk {{ $mitra->name }}</h2>
     <div class="row align-items-center">
         <div class="col-12 mx-auto">
+            <div class="my-2 row justify-content-between">
+                <div class="col">
+                    <a class="btn btn-sm btn-secondary" href="{{ route('mitra.index') }}">Kembali</a>
+                </div>
+                <div class="col" align="right">
+                    <a class="btn btn-sm btn-primary" href="{{ route('produk.create', $mitra->id) }}">
+                        Tambah
+                    </a>
+                </div>
+            </div>
         	<table class="table table-stripped table-white table-bordered table-responsive-sm">
         		<thead class="bg-dark text-white">
         			<tr>
@@ -51,7 +61,7 @@
                         <th>Type</th>
                         <th>Harga</th>
                         <th>Gambar</th>
-                        <th colspan="4">Opsi</th>
+                        <th>Opsi</th>
         			</tr>
         		</thead>
         		<tbody class="bg-white">
@@ -69,26 +79,20 @@
                             @endif
                             </td>
                             <td>
-                                <a class="btn btn-success @if(empty($d->image)) btn-disabled @endif" href="#" @if(!empty($d->image)) onclick="showModal('{{ asset('assets/images/' . $d->image->name)}}')" @endif>Buka</a>
+                                <a class="btn btn-sm btn-success @if(empty($d->image)) btn-disabled @endif" href="#" @if(!empty($d->image)) onclick="showModal('{{ asset('assets/images/' . $d->image->name)}}')" @endif>Buka</a>
                             </td>
                             <td>
                                 @if ($d->type == 'custom')
                                     
                                 @else
-                                    <a class="btn btn-primary" href="{{ route('produk.pilihan.index', [$mitra->id, $d->id]) }}">Detail</a>
+                                    <a class="btn btn-sm btn-primary" href="{{ route('produk.pilihan.index', [$mitra->id, $d->id]) }}">Detail</a>
                                 @endif
-                            </td>
-                            <td>
-                                <button class="btn btn-info" onclick="showModalPaket({{ $d->id }})">Paketkan</button>
-                            </td>
-                            <td>
-                                <a class="btn btn-danger" href="{{ route('produk.edit', [$mitra->id, $d->id]) }}">Edit</a>
-                            </td>
-                            <td>
-                                <form action="{{ route('produk.destroy', [$mitra->id, $d->id]) }}" method="POST" onsubmit="return confirm('Yakin ingin dihapus?')">
+                                <button class="btn btn-sm btn-info" onclick="showModalPaket({{ $d->id }})">Paketkan</button>
+                                <a class="btn btn-sm btn-danger" href="{{ route('produk.edit', [$mitra->id, $d->id]) }}">Edit</a>
+                                <button class="btn btn-sm btn-warning" onclick="$('#form-delete-{{ $d->id }}').submit()">Hapus</button>
+                                <form id="form-delete-{{ $d->id }}" action="{{ route('produk.destroy', [$mitra->id, $d->id]) }}" method="POST" onsubmit="return confirm('Yakin ingin dihapus?')">
                                     @csrf
                                     @method('DELETE')
-                                    <button class="btn btn-warning">Hapus</button>
                                 </form>
                             </td>
                         </tr>
@@ -97,11 +101,6 @@
         	</table>
 
             {{ $data->render() }}
-
-            <a class="btn btn-secondary" href="{{ route('mitra.index') }}">Kembali</a>
-            <a class="btn btn-primary" href="{{ route('produk.create', $mitra->id) }}">
-                Tambah Data Baru
-            </a>
         </div>
     </div>
 </div>

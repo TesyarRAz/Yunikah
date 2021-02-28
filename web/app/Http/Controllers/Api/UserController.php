@@ -61,13 +61,12 @@ class UserController extends Controller
 
     public function update(Request $request)
     {
-        $request->validate([
+        $data = $request->validate([
             'name' => 'required',
             'phone' => 'required'
         ]);
 
-        auth()->user()->fill($request->only(['name', 'phone']));
-        auth()->user()->save();
+        auth()->user()->update($data);
 
         return response(['message' => 'berhasil'], 401);
     }

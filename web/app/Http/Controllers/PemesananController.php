@@ -36,16 +36,14 @@ class PemesananController extends Controller
 
     public function post_produk(StatusPemesanan $status, PemesananProduk $pemesanan)
     {
-    	$pemesanan->status_pemesanan_id = $status->id;
-    	$pemesanan->save();
+    	$pemesanan->update(['status_pemesanan_id' => $status->id]);
 
     	return redirect()->route('pemesanan.index.produk', $status->name);
     }
 
     public function post_paket(StatusPemesanan $status, PemesananPaket $pemesanan)
     {
-    	$pemesanan->status_pemesanan_id = $status->id;
-    	$pemesanan->save();
+    	$pemesanan->update(['status_pemesanan_id' => $status->id]);
 
     	return redirect()->route('pemesanan.index.paket', $status->name);
     }

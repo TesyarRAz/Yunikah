@@ -11,6 +11,11 @@
 	<h2 class="text-center">Daftar Paket</h2>
     <div class="row align-items-center">
         <div class="col-12 mx-auto">
+            <div class="my-2" align="right">
+                <a class="btn btn-sm btn-primary" href="{{ route('paket.create') }}">
+                    Tambah
+                </a>
+            </div>
         	<table class="table table-stripped table-white table-bordered table-responsive-sm">
         		<thead class="bg-dark text-white">
         			<tr>
@@ -18,7 +23,7 @@
         				<th>Nama</th>
                         <th>Harga</th>
                         <th>Gambar</th>
-                        <th colspan="3">Opsi</th>
+                        <th>Opsi</th>
         			</tr>
         		</thead>
         		<tbody class="bg-white">
@@ -29,29 +34,21 @@
                             <td>{{ $d->name }}</td>
                             <td>Rp. {{ number_format($d->harga, 2, ',', '.') }}</td>
                             <td>
-                                <a class="btn btn-success" href="#" @if(!empty($d->image)) onclick="showModal('{{ asset('assets/images/' . $d->image->name)}}')" @endif>Buka</a>
+                                <a class="btn btn-sm btn-success" href="#" @if(!empty($d->image)) onclick="showModal('{{ asset('assets/images/' . $d->image->name)}}')" @endif>Buka</a>
                             </td>
                             <td>
-                                <a class="btn btn-secondary" href="{{ route('paket.detail.index', $d->id) }}">Detail Paket</a>
-                            </td>
-                            <td>
-                                <a class="btn btn-danger" href="{{ route('paket.edit', $d->id) }}">Edit</a>
-                            </td>
-                            <td>
-                                <form action="{{ route('paket.destroy', $d->id) }}" method="POST" onsubmit="return confirm('Yakin ingin dihapus?')">
+                                <a class="btn btn-sm btn-secondary" href="{{ route('paket.detail.index', $d->id) }}">Detail Paket</a>
+                                <a class="btn btn-sm btn-danger" href="{{ route('paket.edit', $d->id) }}">Edit</a>
+                                <button class="btn btn-sm btn-warning" onclick="$('#form-delete-{{ $d->id }}').submit()">Hapus</button>
+                                <form id="form-delete-{{ $d->id }}" action="{{ route('paket.destroy', $d->id) }}" method="POST" onsubmit="return confirm('Yakin ingin dihapus?')">
                                     @csrf
                                     @method('DELETE')
-                                    <button class="btn btn-warning">Hapus</button>
                                 </form>
                             </td>
                         </tr>
                     @endforeach
         		</tbody>
         	</table>
-
-            <a class="btn btn-primary" href="{{ route('paket.create') }}">
-                Tambah Data Baru
-            </a>
         </div>
     </div>
 </div>
