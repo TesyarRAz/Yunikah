@@ -10,19 +10,17 @@ class MenuPage extends StatefulWidget {
 }
 
 class _MenuPageState extends State<MenuPage> {
-  PageStorageBucket _pageStorageBucket;
+  late PageStorageBucket _pageStorageBucket;
   int index = 0;
 
   @override
   void initState() {
     super.initState();
 
-    SystemChrome.setEnabledSystemUIOverlays(
-      [
-        SystemUiOverlay.top,
-        SystemUiOverlay.bottom
-      ]
-    );
+    SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual, overlays: [
+      SystemUiOverlay.top,
+      SystemUiOverlay.bottom,
+    ]);
 
     _pageStorageBucket = PageStorageBucket();
   }
@@ -81,15 +79,15 @@ class _MenuPageState extends State<MenuPage> {
       },
       items: <BottomNavigationBarItem>[
         BottomNavigationBarItem(
-          title: Text('Home'),
+          label: 'Home',
           icon: Icon(Icons.home),
         ),
         BottomNavigationBarItem(
-          title: Text('Keranjang'),
+          label: 'Keranjang',
           icon: Icon(Icons.shopping_cart)
         ),
         BottomNavigationBarItem(
-          title: Text('Profile'),
+          label: 'Profile',
           icon: Icon(Icons.account_box)
         )
       ],

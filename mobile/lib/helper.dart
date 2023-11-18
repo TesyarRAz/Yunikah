@@ -7,7 +7,7 @@ class Helper {
       context: context,
       barrierDismissible: false,
       builder: (_) => Dialog(
-        child: LoadingComponent(),
+        child: CircularProgressIndicator(),
       )
     );
   }

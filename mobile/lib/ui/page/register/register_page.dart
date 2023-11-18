@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:yunikah/helper.dart';
-import 'package:yunikah/model/model.dart';
+import 'package:yunikah/model/user.dart';
 import 'package:yunikah/network.dart';
 
 class RegisterPage extends StatefulWidget {
@@ -9,7 +9,7 @@ class RegisterPage extends StatefulWidget {
 }
 
 class _RegisterPageState extends State<RegisterPage> with SingleTickerProviderStateMixin {
-  TextEditingController _textUsername, _textPassword, _textNama, _textPhone, _textEmail;
+  late TextEditingController _textUsername, _textPassword, _textNama, _textPhone, _textEmail;
   
   bool _showPassword = false;
   int _pageIndex = 1;
@@ -39,7 +39,7 @@ class _RegisterPageState extends State<RegisterPage> with SingleTickerProviderSt
                 Text('Register'),
                 Text(
                   'Yunikah',
-                  style: Theme.of(context).textTheme.title.apply(
+                  style: Theme.of(context).textTheme.titleLarge?.apply(
                     fontSizeDelta: 15,
                     color: Theme.of(context).primaryColor
                   ),
@@ -168,11 +168,11 @@ class _RegisterPageState extends State<RegisterPage> with SingleTickerProviderSt
                 showDialog(
                   context: context,
                   builder: (_) => AlertDialog(
-                    content: Text(result['message'] ?? "Inputan tidak benar"),
+                    content: Text(result?['message'] ?? "Inputan tidak benar"),
                   ),
                 )
                 .then((_) {
-                  if (result['status'] == 200)
+                  if (result?['status'] == 200)
                     Navigator.of(context).pop();
                 });
               });

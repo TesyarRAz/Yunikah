@@ -2,23 +2,30 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:yunikah/constant/routes.dart';
-import 'package:yunikah/model/model.dart';
+import 'package:yunikah/model/api_data.dart';
+import 'package:yunikah/model/iklan.dart';
+import 'package:yunikah/model/mitra.dart';
+import 'package:yunikah/model/paket.dart';
+import 'package:yunikah/model/produk.dart';
 import 'package:yunikah/network.dart';
 import 'package:yunikah/provider/network_provider.dart';
 import 'package:yunikah/ui/page.dart';
 import 'package:yunikah/ui/component/component.dart';
+import 'package:yunikah/ui/page/mitra/mitra_page.dart';
+import 'package:yunikah/ui/page/paket/paket_page.dart';
+import 'package:yunikah/ui/page/produk/produk_page.dart';
 
 class HomePage extends StatefulWidget {
-  HomePage({Key key}) : super(key: key);
+  HomePage({Key? key}) : super(key: key);
 
   @override
   State<StatefulWidget> createState() => _HomePageState();
 }
 
 class _HomePageState extends State<HomePage> {
-  Map<String, dynamic> _cacheData;
+  late Map<String, dynamic> _cacheData;
 
-  ScrollController _mainScroll, _produkScroll, _paketScroll, _mitraScroll;
+  late ScrollController _mainScroll, _produkScroll, _paketScroll, _mitraScroll;
 
   @override
   void initState() {
@@ -45,7 +52,7 @@ class _HomePageState extends State<HomePage> {
             else if (snapshot.connectionState == ConnectionState.done) {
               if (snapshot.hasData)
                 return _buildBody(
-                  snapshot.data
+                  snapshot.data!
                 );
 
               return Center(
@@ -53,7 +60,7 @@ class _HomePageState extends State<HomePage> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: <Widget>[
                     Text('Tidak ada data'),
-                    FlatButton(
+                    TextButton(
                       onPressed: () => setState(() {
                         PageStorage.of(context).writeState(context, null, identifier: 'home_data');
                       }),
@@ -119,13 +126,13 @@ class _HomePageState extends State<HomePage> {
           children: [
             Text(
               'Hai,',
-              style: Theme.of(context).textTheme.title.apply(
+              style: Theme.of(context).textTheme.titleLarge?.apply(
                 fontSizeDelta: 5
               ),
             ),
             Text(
               'Lagi cari apa?',
-              style: Theme.of(context).textTheme.subtitle,
+              style: Theme.of(context).textTheme.titleMedium,
             )
           ],
         ),
@@ -143,7 +150,7 @@ class _HomePageState extends State<HomePage> {
             Expanded(
               child: Text(
                 'Kategori',
-                style: Theme.of(context).textTheme.title.apply(
+                style: Theme.of(context).textTheme.titleLarge?.apply(
                   fontSizeDelta: 0.5
                 ),
               ),
@@ -151,7 +158,7 @@ class _HomePageState extends State<HomePage> {
             GestureDetector(
               child: Text(
                 'Lebih Banyak >',
-                style: Theme.of(context).textTheme.caption,
+                style: Theme.of(context).textTheme.bodySmall,
               ),
             )
           ],
@@ -188,7 +195,7 @@ class _HomePageState extends State<HomePage> {
           children: [
             Expanded(
               child: CachedNetworkImage(
-                imageUrl: kategori.image.link,
+                imageUrl: kategori.image!.link,
                 imageBuilder: (context, imageProvider) => Container(
                   decoration: BoxDecoration(
                     image: DecorationImage(
@@ -203,7 +210,7 @@ class _HomePageState extends State<HomePage> {
               padding: const EdgeInsets.all(8.0),
               child: Text(
                 kategori.name,
-                style: Theme.of(context).textTheme.subtitle,
+                style: Theme.of(context).textTheme.titleMedium,
               ),
             )
           ]
@@ -222,7 +229,7 @@ class _HomePageState extends State<HomePage> {
             Expanded(
               child: Text(
                 'Paket',
-                style: Theme.of(context).textTheme.title.apply(
+                style: Theme.of(context).textTheme.titleLarge?.apply(
                   fontSizeDelta: 0.5
                 ),
               ),
@@ -230,7 +237,7 @@ class _HomePageState extends State<HomePage> {
             GestureDetector(
               child: Text(
                 'Lebih Banyak >',
-                style: Theme.of(context).textTheme.caption,
+                style: Theme.of(context).textTheme.bodySmall,
               ),
             )
           ],
@@ -279,7 +286,7 @@ class _HomePageState extends State<HomePage> {
               padding: const EdgeInsets.all(8.0),
               child: Text(
                 paket.name,
-                style: Theme.of(context).textTheme.subtitle,
+                style: Theme.of(context).textTheme.titleMedium,
               ),
             )
           ]
@@ -298,7 +305,7 @@ class _HomePageState extends State<HomePage> {
             Expanded(
               child: Text(
                 'Mitra',
-                style: Theme.of(context).textTheme.title.apply(
+                style: Theme.of(context).textTheme.titleLarge?.apply(
                   fontSizeDelta: 0.5
                 ),
               ),
@@ -306,7 +313,7 @@ class _HomePageState extends State<HomePage> {
             GestureDetector(
               child: Text(
                 'Lebih Banyak >',
-                style: Theme.of(context).textTheme.caption,
+                style: Theme.of(context).textTheme.bodySmall,
               ),
             )
           ],
@@ -355,7 +362,7 @@ class _HomePageState extends State<HomePage> {
               padding: const EdgeInsets.all(8.0),
               child: Text(
                 mitra.name,
-                style: Theme.of(context).textTheme.title,
+                style: Theme.of(context).textTheme.titleLarge,
               ),
             )
           ]
@@ -379,9 +386,9 @@ class _HomePageState extends State<HomePage> {
           'mitra': value[2]
         };
 
-        Provider.of<IklanProvider>(context, listen: false).value = value[0];
-        Provider.of<PaketProvider>(context, listen: false).value = value[1];
-        Provider.of<MitraProvider>(context, listen: false).value = value[2];
+        Provider.of<IklanProvider>(context, listen: false).value = value[0] as ApiData<Iklan>?;
+        Provider.of<PaketProvider>(context, listen: false).value = value[1] as ApiData<Paket>?;
+        Provider.of<MitraProvider>(context, listen: false).value = value[2] as ApiData<Mitra>?;
         
         PageStorage.of(context).writeState(context, _cacheData, identifier: 'home_data');
 

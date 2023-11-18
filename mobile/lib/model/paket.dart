@@ -7,7 +7,7 @@ class DataPaket {
 
   Produk produk;
 
-  DataPaket({this.id, this.name, this.produk});
+  DataPaket({required this.id, required this.name, required this.produk});
 
   factory DataPaket.parseFromJson(Map<String, dynamic> map) => DataPaket(
     id: map['id'],
@@ -25,9 +25,9 @@ class Paket {
   String keterangan;
 
   Asset image;
-  List<DataPaket> data;
+  List<DataPaket>? data;
 
-  Paket({this.id, this.name, this.harga, this.image, this.data, this.keterangan});
+  Paket({required this.id, required this.name, required this.harga, required this.image,  this.data, required this.keterangan});
 
   factory Paket.parseFromJson(Map<String, dynamic> data) => Paket(
     id: data['id'],

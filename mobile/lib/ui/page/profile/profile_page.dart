@@ -6,11 +6,12 @@ import 'package:yunikah/helper.dart';
 import 'package:yunikah/network.dart';
 import 'package:yunikah/provider/auth_provider.dart';
 import 'package:yunikah/ui/page.dart';
+import 'package:yunikah/ui/page/pembelian/status_pembelian_page.dart';
 
 class ProfilePage extends StatelessWidget {
   Function onRestart = () {};
 
-  ProfilePage({Key key, this.onRestart}) : super(key: key);
+  ProfilePage({Key? key, required this.onRestart}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -19,8 +20,8 @@ class ProfilePage extends StatelessWidget {
       body: Column(
         children: <Widget>[
           UserAccountsDrawerHeader(
-            accountEmail: Text(user.phone),
-            accountName: Text(user.name)
+            accountEmail: Text(user?.phone ?? ''),
+            accountName: Text(user?.name ?? '')
           ),
           SingleChildScrollView(
             child: Column(
@@ -47,7 +48,7 @@ class ProfilePage extends StatelessWidget {
                                   padding: const EdgeInsets.all(8.0),
                                   child: Text(
                                     'Dikirim',
-                                    style: Theme.of(context).textTheme.caption
+                                    style: Theme.of(context).textTheme.bodySmall
                                   ),
                                 )
                               ]
@@ -73,7 +74,7 @@ class ProfilePage extends StatelessWidget {
                                   padding: const EdgeInsets.all(8.0),
                                   child: Text(
                                     'Dikonfirm',
-                                    style: Theme.of(context).textTheme.caption
+                                    style: Theme.of(context).textTheme.bodySmall
                                   ),
                                 )
                               ]
@@ -99,7 +100,7 @@ class ProfilePage extends StatelessWidget {
                                   padding: const EdgeInsets.all(8.0),
                                   child: Text(
                                     'Diproses',
-                                    style: Theme.of(context).textTheme.caption
+                                    style: Theme.of(context).textTheme.bodySmall
                                   ),
                                 )
                               ]
@@ -125,7 +126,7 @@ class ProfilePage extends StatelessWidget {
                                   padding: const EdgeInsets.all(8.0),
                                   child: Text(
                                     'Selesai',
-                                    style: Theme.of(context).textTheme.caption
+                                    style: Theme.of(context).textTheme.bodySmall
                                   ),
                                 )
                               ]
@@ -143,7 +144,7 @@ class ProfilePage extends StatelessWidget {
                   onTap: () {
                     Helper.showLoading(context);
 
-                    Network.instance.logout(user.token)
+                    Network.instance.logout(user!.token!)
                     .then((status) {
                       Navigator.of(context).pop();
 

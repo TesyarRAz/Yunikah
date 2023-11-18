@@ -15,16 +15,16 @@ class Network {
   static final instance = Network._();
 
   static const RANDOM_IMAGE_LINK = "https://source.unsplash.com/random";
-  static const API_URL = "http://192.168.43.126/api/";
+  static const API_URL = "https://yunikah.tesyarraz.my.id/api/";
 
   Network._();
 
   final _client = Client();
 
-  Future<bool> checkoutProduk(String token, PemesananProduk pemesanan) async {
+  Future<bool?> checkoutProduk(String token, PemesananProduk pemesanan) async {
     try {
       return await _client.post(
-        API_URL + "pemesanan/produk/checkout/${pemesanan.id}",
+        Uri.parse(API_URL + "pemesanan/produk/checkout/${pemesanan.id}"),
         headers: {
           HttpHeaders.authorizationHeader : "Bearer $token"
         },
@@ -39,10 +39,10 @@ class Network {
     }
   }
 
-  Future<bool> checkoutPaket(String token, PemesananPaket pemesanan) async {
+  Future<bool?> checkoutPaket(String token, PemesananPaket pemesanan) async {
     try {
       return await _client.post(
-        API_URL + "pemesanan/paket/checkout/${pemesanan.id}",
+        Uri.parse(API_URL + "pemesanan/paket/checkout/${pemesanan.id}"),
         headers: {
           HttpHeaders.authorizationHeader : "Bearer $token"
         },
@@ -57,10 +57,10 @@ class Network {
     }
   }
 
-  Future<bool> hapusPemesananProduk(String token, PemesananProduk pemesanan) async {
+  Future<bool?> hapusPemesananProduk(String token, PemesananProduk pemesanan) async {
     try {
       return await _client.delete(
-        API_URL + "pemesanan/produk/${pemesanan.id}",
+        Uri.parse(API_URL + "pemesanan/produk/${pemesanan.id}"),
         headers: {
           HttpHeaders.authorizationHeader : "Bearer $token"
         }
@@ -71,10 +71,10 @@ class Network {
     }
   }
 
-  Future<bool> hapusPemesananPaket(String token, PemesananPaket pemesanan) async {
+  Future<bool?> hapusPemesananPaket(String token, PemesananPaket pemesanan) async {
     try {
       return await _client.delete(
-        API_URL + "pemesanan/paket/${pemesanan.id}",
+        Uri.parse(API_URL + "pemesanan/paket/${pemesanan.id}"),
         headers: {
           HttpHeaders.authorizationHeader : "Bearer $token"
         }
@@ -88,7 +88,7 @@ class Network {
   Future<List<PemesananProduk>> getPemesananProduk(String token) async {
     try {
       return await _client.get(
-        API_URL + "pemesanan/produk",
+        Uri.parse(API_URL + "pemesanan/produk"),
         headers: {
           HttpHeaders.authorizationHeader : "Bearer $token"
         }
@@ -103,7 +103,7 @@ class Network {
   Future<List<PemesananPaket>> getPemesananPaket(String token) async {
     try {
       return await _client.get(
-        API_URL + "pemesanan/paket",
+        Uri.parse(API_URL + "pemesanan/paket"),
         headers: {
           HttpHeaders.authorizationHeader : "Bearer $token"
         }
@@ -115,10 +115,10 @@ class Network {
     }
   }
 
-  Future<bool> pesanProdukTersedia(String token, Produk produk, DetailProduk detail) async {
+  Future<bool?> pesanProdukTersedia(String token, Produk produk, DetailProduk detail) async {
     try {
       return await _client.post(
-        API_URL + "pemesanan/produk/${produk.id}",
+        Uri.parse(API_URL + "pemesanan/produk/${produk.id}"),
         headers: {
           HttpHeaders.authorizationHeader : 'Bearer $token'
         },
@@ -136,10 +136,10 @@ class Network {
     }
   }
 
-  Future<bool> pesanProdukCustom(String token, Produk produk, int jumlah) async {
+  Future<bool?> pesanProdukCustom(String token, Produk produk, int jumlah) async {
     try {
       return await _client.post(
-        API_URL + "pemesanan/produk/${produk.id}",
+        Uri.parse(API_URL + "pemesanan/produk/${produk.id}"),
         headers: {
           HttpHeaders.authorizationHeader : 'Bearer $token'
         },
@@ -156,10 +156,10 @@ class Network {
     }
   }
 
-  Future<bool> pesanPaket(String token, Paket paket) async {
+  Future<bool?> pesanPaket(String token, Paket paket) async {
     try {
       return await _client.post(
-        API_URL + "pemesanan/paket/${paket.id}",
+        Uri.parse(API_URL + "pemesanan/paket/${paket.id}"),
         headers: {
           HttpHeaders.authorizationHeader : 'Bearer $token'
         }
@@ -170,10 +170,10 @@ class Network {
     }
   }
 
-  Future<ApiData<Produk>> mitraProduk(Mitra mitra, int page) async {
+  Future<ApiData<Produk>?> mitraProduk(Mitra mitra, int page) async {
     try {
       return ApiData.parseFromJson(
-        await _client.get(API_URL + "mitra/${mitra.id}/produk")
+        await _client.get(Uri.parse(API_URL + "mitra/${mitra.id}/produk"))
         .then((response) => jsonDecode(response.body)),
         parseProdukFromJson
       );
@@ -182,10 +182,10 @@ class Network {
     }
   }
 
-  Future<ApiData<Produk>> neighbordProduk(Produk produk, int page) async {
+  Future<ApiData<Produk>?> neighbordProduk(Produk produk, int page) async {
     try {
       var data =  ApiData.parseFromJson(
-        await _client.get(API_URL + "mitra/${produk.mitra.id}/produk")
+        await _client.get(Uri.parse(API_URL + "mitra/${produk.mitra.id}/produk"))
         .then((response) => jsonDecode(response.body)),
         parseProdukFromJson
       );
@@ -198,9 +198,9 @@ class Network {
     }
   }
 
-  Future<ApiData<Paket>> allPaket(int page) async {
+  Future<ApiData<Paket>?> allPaket(int page) async {
     try {
-      return await _client.get(API_URL + "paket/?page=$page")
+      return await _client.get(Uri.parse(API_URL + "paket/?page=$page"))
       .then((response) => jsonDecode(response.body))
       .then((json) => ApiData.parseFromJson(json, parsePaketFromJson));
     } catch (ex) {
@@ -208,9 +208,9 @@ class Network {
     }
   }
   
-  Future<ApiData<Mitra>> allMitra(int page) async {
+  Future<ApiData<Mitra>?> allMitra(int page) async {
     try {
-      return await _client.get(API_URL + "mitra/?page=$page")
+      return await _client.get(Uri.parse(API_URL + "mitra/?page=$page"))
       .then((response) => jsonDecode(response.body))
       .then((json) => ApiData.parseFromJson(json, parseMitraFromJson));
     } catch (ex) {
@@ -218,9 +218,9 @@ class Network {
     }
   }
 
-  Future<ApiData<Iklan>> allIklan(int page) async {
+  Future<ApiData<Iklan>?> allIklan(int page) async {
     try {
-      return await _client.get(API_URL + "iklan/?page=$page")
+      return await _client.get(Uri.parse(API_URL + "iklan/?page=$page"))
       .then((response) => jsonDecode(response.body))
       .then((json) => ApiData.parseFromJson(json, parseIklanFromJson));
     } catch (ex) {
@@ -228,9 +228,9 @@ class Network {
     }
   }
 
-  Future<ApiData<Produk>> allProduk(String kategori, int page) async {
+  Future<ApiData<Produk>?> allProduk(String kategori, int page) async {
     try {
-      return await _client.get(API_URL + "produk/$kategori/?page=$page")
+      return await _client.get(Uri.parse(API_URL + "produk/$kategori/?page=$page"))
       .then((response) => jsonDecode(response.body))
       .then((json) => ApiData.parseFromJson(json, parseProdukFromJson));
     } catch (ex) {
@@ -238,10 +238,10 @@ class Network {
     }
   }
 
-  Future<Map<String, dynamic>> register(User user) async {
+  Future<Map<String, dynamic>?> register(User user) async {
     try {
       var result = await _client.post(
-        API_URL + "auth/register", 
+        Uri.parse(API_URL + "auth/register"),
         body: {
           'username' : user.username,
           'password' : user.password,
@@ -260,10 +260,10 @@ class Network {
     }
   }
 
-  Future<User> login(String username, String password) async {
+  Future<User?> login(String username, String password) async {
     try {
       var result = await _client.post(
-        API_URL + "auth/login", 
+        Uri.parse(API_URL + "auth/login"),
         body: {
           'username' : username,
           'password' : password
@@ -276,10 +276,10 @@ class Network {
     }
   }
 
-  Future<bool> logout(String token) async {
+  Future<bool?> logout(String token) async {
     try {
       return await _client.get(
-        API_URL + "auth/logout",
+        Uri.parse(API_URL + "auth/logout"),
         headers: {
           HttpHeaders.authorizationHeader : "Bearer $token"
         }
@@ -292,10 +292,10 @@ class Network {
     }
   }
 
-  Future<User> userData(String token) async {
+  Future<User?> userData(String token) async {
     try {
       return await _client.get(
-        API_URL + "auth/user",
+        Uri.parse(API_URL + "auth/user"),
         headers: {
           HttpHeaders.authorizationHeader : "Bearer $token"
         }
@@ -308,25 +308,25 @@ class Network {
     }
   }
 
-  Future<List<ApiData<dynamic>>> search(String text) async {
+  Future<List<ApiData<dynamic>>?> search(String text) async {
     try {
       return await Future.wait([
         _client.get(
-          API_URL + "mitra/search?q=$text",
+          Uri.parse(API_URL + "mitra/search?q=$text"),
         )
         .then((response) => ApiData.parseFromJson(
           jsonDecode(response.body),
           parseMitraFromJson)
         ),
         _client.get(
-          API_URL + "paket/search?q=$text"
+          Uri.parse(API_URL + "paket/search?q=$text")
         )
         .then((response) => ApiData.parseFromJson(
           jsonDecode(response.body),
           parsePaketFromJson)
         ),
         _client.get(
-          API_URL + "produk/search?q=$text"
+          Uri.parse(API_URL + "produk/search?q=$text")
         )
         .then((response) => ApiData.parseFromJson(
           jsonDecode(response.body),

@@ -40,23 +40,25 @@ class _IklanComponentState extends State<IklanComponent> {
             ),
           ),
         )).toList(),
-        height: 200,
-        autoPlay: true,
-        autoPlayCurve: Curves.easeInOut,
-        enableInfiniteScroll: true,
-        viewportFraction: 1.0,
-        aspectRatio: 16 / 9,
-        onPageChanged: (nIndex) {
-          setState(() {
-            index = nIndex;
-          });
-        }
+        options: CarouselOptions(
+            height: 200,
+            autoPlay: true,
+            autoPlayCurve: Curves.easeInOut,
+            enableInfiniteScroll: true,
+            viewportFraction: 1.0,
+            aspectRatio: 16 / 9,
+            onPageChanged: (nIndex, _) {
+              setState(() {
+                index = nIndex;
+              });
+            }
+        ),
       ),
       Positioned(
         bottom: 0,
         child: DotsIndicator(
           dotsCount: widget.iklans.data.length,
-          position: index * 1.0,
+          position: index * 1,
           decorator: DotsDecorator(
             activeColor: Theme.of(context).primaryColor,
             color: Colors.white,

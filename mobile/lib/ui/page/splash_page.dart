@@ -8,17 +8,17 @@ class SplashPage extends StatefulWidget {
 }
 
 class _SplashPageState extends State<SplashPage> with SingleTickerProviderStateMixin {
-  AnimationController _animationController;
-  CurvedAnimation _curvedAnimation;
+  late AnimationController _animationController;
+  late CurvedAnimation _curvedAnimation;
 
-  Animation<Color> _colorAnimation;
-  Animation<double> _sizeAnimation;
+  late Animation<Color?> _colorAnimation;
+  late Animation<double> _sizeAnimation;
 
   @override
   void initState() {
     super.initState();
 
-    SystemChrome.setEnabledSystemUIOverlays([]);
+    SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle());
 
     _animationController = AnimationController(vsync: this, duration: Duration(seconds: 3));
     _curvedAnimation = CurvedAnimation(parent: _animationController, curve: Curves.easeInOut);

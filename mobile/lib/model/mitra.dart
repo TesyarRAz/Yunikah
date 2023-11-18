@@ -7,11 +7,11 @@ class Mitra {
   int transaksi;
 
   Asset image;
-  List<Produk> produk;
+  List<Produk>? produk;
 
-  Mitra({this.id, this.name, this.transaksi, this.image, this.produk});
+  Mitra({required this.id, required this.name, required this.transaksi, required this.image, this.produk});
 
-  factory Mitra.parseFromJson(Map<String, dynamic> data) => data == null ? null : Mitra(
+  factory Mitra.parseFromJson(Map<String, dynamic> data) => Mitra(
     id: data['id'],
     name: data['name'],
     image: Asset.parseFromJson(data['image']),

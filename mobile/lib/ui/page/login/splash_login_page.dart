@@ -6,7 +6,7 @@ import 'package:yunikah/model/user.dart';
 import 'package:yunikah/provider/auth_provider.dart';
 
 class SplashLoginPage extends StatelessWidget {
-  SplashLoginPage({Key key}) : super(key: key);
+  SplashLoginPage({Key? key}) : super(key: key);
   
   @override
   Widget build(BuildContext context) {
@@ -17,12 +17,12 @@ class SplashLoginPage extends StatelessWidget {
           children: [
             Text(
               'Anda belum login',
-              style: Theme.of(context).textTheme.title,
+              style: Theme.of(context).textTheme.titleLarge,
               textAlign: TextAlign.center,
             ),
             Text(
               'Silahkan login terlebih dahulu',
-              style: Theme.of(context).textTheme.subtitle,
+              style: Theme.of(context).textTheme.titleMedium,
             ),
             MaterialButton(
               color: Theme.of(context).primaryColor,
@@ -38,12 +38,12 @@ class SplashLoginPage extends StatelessWidget {
               children: <Widget>[
                 Text(
                   'Belum punya akun?',
-                  style: Theme.of(context).textTheme.overline,
+                  style: Theme.of(context).textTheme.labelSmall,
                 ),
-                FlatButton(
+                TextButton(
                   child: Text(
                     'Daftar',
-                    style: Theme.of(context).textTheme.overline.apply(
+                    style: Theme.of(context).textTheme.labelSmall?.apply(
                       color: Colors.blue
                     ),
                   ),
@@ -55,9 +55,9 @@ class SplashLoginPage extends StatelessWidget {
                       if (user != null) {
                         SharedPreferences.getInstance().then((pref) {
                           pref.setString("username", user.username);
-                          pref.setString("password", user.password);
+                          pref.setString("password", user.password!);
                           pref.setString("name", user.name);
-                          pref.setString("token", user.token);
+                          pref.setString("token", user.token!);
                           
                           Provider.of<AuthProvider>(context).value = user;
                         });

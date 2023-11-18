@@ -15,8 +15,8 @@ class LoginPage extends StatefulWidget {
 class _LoginPageState extends State<LoginPage> {
   bool showPassword = false;
 
-  TextEditingController _textUsername;
-  TextEditingController _textPassword;
+  late TextEditingController _textUsername;
+  late TextEditingController _textPassword;
 
   @override
   void initState() {
@@ -39,7 +39,7 @@ class _LoginPageState extends State<LoginPage> {
             children: [
               Text(
                 'Yunikah', 
-                style: Theme.of(context).textTheme.display2.apply(
+                style: Theme.of(context).textTheme.displayMedium?.apply(
                   color: Theme.of(context).primaryColor
                 ),
               ),
@@ -84,7 +84,7 @@ class _LoginPageState extends State<LoginPage> {
                     Navigator.of(context).pop();
                     if (user != null) {
                       SharedPreferences.getInstance().then((prefs) {
-                        prefs.setString("token", user.token);
+                        prefs.setString("token", user.token!);
                         
                         Provider.of<AuthProvider>(context).value = user;
                       });

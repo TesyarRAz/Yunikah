@@ -3,9 +3,14 @@ import 'dart:async';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:yunikah/constant/routes.dart';
-import 'package:yunikah/model/model.dart';
+import 'package:yunikah/model/mitra.dart';
+import 'package:yunikah/model/paket.dart';
+import 'package:yunikah/model/produk.dart';
 import 'package:yunikah/network.dart';
 import 'package:yunikah/ui/page.dart';
+import 'package:yunikah/ui/page/detail_produk_page.dart';
+import 'package:yunikah/ui/page/mitra/mitra_page.dart';
+import 'package:yunikah/ui/page/paket/paket_page.dart';
 
 class SearchPage extends StatefulWidget {
   @override
@@ -13,9 +18,9 @@ class SearchPage extends StatefulWidget {
 }
 
 class _SearchPageState extends State<SearchPage> {
-  TextEditingController _searchText;
+  late TextEditingController _searchText;
 
-  List<Widget> _searchData;
+  late List<Widget> _searchData;
   bool _searchLoading = false;
 
   @override
@@ -66,34 +71,32 @@ class _SearchPageState extends State<SearchPage> {
 
     Network.instance.search(_searchText.text)
     .then((value) {
-      var mitra = value[0];
-      var paket = value[1];
-      var produk = value[2];
+      var mitra = value?[0];
+      var paket = value?[1];
+      var produk = value?[2];
 
       var result = <Widget>[];
 
-      if (mitra.data.length > 0) {
-        result.add(_buildItemSearch(mitra.data, {
+      if ((mitra?.data.length ?? 0) > 0) {
+        result.add(_buildItemSearch(mitra!.data, {
           'title' : 'Mitra',
           'generate_page': (Mitra m) => MitraPage(mitra: m,)
         }));
       }
 
-      if (paket.data.length > 0) {
-        result.add(_buildItemSearch(paket.data, {
+      if ((paket?.data.length ?? 0) > 0) {
+        result.add(_buildItemSearch(paket!.data, {
           'title' : 'Paket',
           'generate_page': (Paket m) => PaketPage(paket: m,)
         }));
       }
 
-      if (produk.data.length > 0) {
-        result.add(_buildItemSearch(produk.data, {
+      if ((produk?.data.length ?? 0) > 0) {
+        result.add(_buildItemSearch(produk!.data, {
           'title' : 'Produk',
           'generate_page' : (Produk m) => DetailProdukPage(produk: m,)
         }));
       }
-
-      print(produk.data.length);
 
       setState(() {
         _searchData = result;
@@ -109,7 +112,7 @@ class _SearchPageState extends State<SearchPage> {
       children: <Widget>[
         Text(
           config['title'],
-          style: Theme.of(context).textTheme.title,
+          style: Theme.of(context).textTheme.titleLarge,
         ),
         GridView.count(
           physics: NeverScrollableScrollPhysics(),
@@ -144,7 +147,7 @@ class _SearchPageState extends State<SearchPage> {
                     padding: const EdgeInsets.all(8.0),
                     child: Text(
                       m.name,
-                      style: Theme.of(context).textTheme.subtitle,
+                      style: Theme.of(context).textTheme.titleMedium,
                     ),
                   )
                 ],

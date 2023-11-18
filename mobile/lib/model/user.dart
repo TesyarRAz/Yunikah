@@ -3,8 +3,8 @@ class StatusUser {
   String name;
 
   StatusUser({
-    this.id,
-    this.name
+    required this.id,
+    required this.name
   });
 
   factory StatusUser.parseFromJson(Map<String, dynamic> data) => StatusUser(
@@ -14,29 +14,29 @@ class StatusUser {
 }
 
 class User {
-  int id;
+  int? id;
   String name;
   String username;
-  String password;
+  String? password;
   String phone;
-  String alamat;
+  String? alamat;
   String email;
 
   // For Authentication
-  String token;
+  String? token;
 
-  StatusUser statusUser;
+  StatusUser? statusUser;
 
   User({
     this.id,
-    this.name,
-    this.username,
+    required this.name,
+    required this.username,
     this.password,
-    this.phone,
+    required this.phone,
     this.alamat,
     this.token,
     this.statusUser,
-    this.email
+    required this.email
   });
 
   factory User.parseFromJson(Map<String, dynamic> data) => User(

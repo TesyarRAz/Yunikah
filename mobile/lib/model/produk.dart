@@ -5,12 +5,12 @@ import 'package:yunikah/network.dart';
 class Kategori {
   int id;
   String name;
-  String url;
+  String? url;
 
   // Very Optional, only for system
-  Asset image;
+  Asset? image;
 
-  Kategori({this.id, this.name, this.url, this.image});
+  Kategori({required this.id, required this.name, this.url, this.image});
   
   factory Kategori.parseFromJson(Map<String, dynamic> map) => Kategori(
     id: map['id'],
@@ -24,7 +24,7 @@ class DetailProduk {
 
   int harga;
 
-  DetailProduk({this.id, this.name, this.harga});
+  DetailProduk({required this.id, required this.name, required this.harga});
 
   factory DetailProduk.parseFromJson(Map<String, dynamic> map) => DetailProduk(
     id: map['id'],
@@ -50,20 +50,20 @@ class Produk {
   Mitra mitra;
   Asset image;
   ProdukType type;
-  Kategori kategori;
-  List<DetailProduk> data;
+  Kategori? kategori;
+  List<DetailProduk>? data;
 
   Produk({
-    this.id, 
-    this.harga, 
-    this.name, 
-    this.keterangan, 
-    this.mitra,
-    this.image, 
-    this.type, 
-    this.kategori, 
+    required this.id,
+    required this.harga,
+    required this.name,
+    required this.keterangan,
+    required this.mitra,
+    required this.image,
+    required this.type,
+    this.kategori,
     this.data,
-    this.transaksi
+    required this.transaksi
   });
 
   factory Produk.parseFromJson(Map<String, dynamic> data) => Produk(

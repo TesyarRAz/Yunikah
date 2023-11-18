@@ -10,7 +10,7 @@ import 'package:yunikah/ui/component/component.dart';
 import 'package:yunikah/ui/page.dart';
 
 class KeranjangPage extends StatefulWidget {
-  KeranjangPage({Key key}) : super(key: key);
+  KeranjangPage({Key? key}) : super(key: key);
 
   @override
   State<StatefulWidget> createState() => _KeranjangPageState();
@@ -31,8 +31,8 @@ class _KeranjangPageState extends State<KeranjangPage> {
               );
             else if (snapshot.connectionState == ConnectionState.done) {
               if (snapshot.hasData) {
-                if (snapshot.data[0].length > 0 || snapshot.data[1].length > 0)
-                  return _buildBody(snapshot.data);
+                if (snapshot.data![0].length > 0 || snapshot.data![1].length > 0)
+                  return _buildBody(snapshot.data! as List<List<dynamic>>);
                 
                 return Center(
                   child: Text('Belum beli apa apa'),
@@ -44,7 +44,7 @@ class _KeranjangPageState extends State<KeranjangPage> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: <Widget>[
                     Text('Tidak ada data'),
-                    FlatButton(
+                    TextButton(
                       onPressed: () => setState(() {}),
                       child: Text('Refresh'),
                     )
@@ -70,8 +70,8 @@ class _KeranjangPageState extends State<KeranjangPage> {
       },
       child: SingleChildScrollView(
         child: KeranjangBody(
-          produks: data[0],
-          pakets: data[1],
+          produks: data[0] as List<PemesananProduk>,
+          pakets: data[1] as List<PemesananPaket>,
         )
       ),
     ),
@@ -81,9 +81,9 @@ class _KeranjangPageState extends State<KeranjangPage> {
     var auth = Provider.of<AuthProvider>(context);
 
     return await Future.wait([
-      Network.instance.getPemesananProduk(auth.value.token)
+      Network.instance.getPemesananProduk(auth.value!.token!)
       .then((list) => list.where((data) => data.status.id == 1).toList()),
-      Network.instance.getPemesananPaket(auth.value.token)
+      Network.instance.getPemesananPaket(auth.value!.token!)
       .then((list) => list.where((data) => data.status.id == 1).toList()),
     ]);
   }
@@ -93,7 +93,7 @@ class KeranjangBody extends StatefulWidget {
   final List<PemesananPaket> pakets;
   final List<PemesananProduk> produks;
 
-  KeranjangBody({this.pakets, this.produks});
+  KeranjangBody({required this.pakets, required this.produks});
 
   @override
   State<StatefulWidget> createState() => _KeranjangBodyState();
@@ -117,44 +117,44 @@ class _KeranjangBodyState extends State<KeranjangBody> {
           onPressed: () {
             if (pakets.length == 0 && produks.length == 0) return;
 
-            Navigator.of(context).push(
-              Routes.generatePage(
-                (_) => CheckoutPage(
-                  onPostCheckout: (context, data) {
-                    Helper.showLoading(context);
-
-                    var user = Provider.of<AuthProvider>(context).value;
-
-                    Future.wait(
-                      []
-                      ..addAll(pakets.map((pemesanan) {
-                        pemesanan.tanggal = data['tanggal_pernikahan'];
-                        pemesanan.alamat = data['alamat'];
-
-                        return Network.instance.checkoutPaket(user.token, pemesanan);
-                      }).toList())
-                      ..addAll(produks.map((pemesanan) {
-                        pemesanan.tanggal = data['tanggal_pernikahan'];
-                        pemesanan.alamat = data['alamat'];
-
-                        return Network.instance.checkoutProduk(user.token, pemesanan);
-                      }))
-                    )
-                    .then((value) {
-                      Navigator.of(context).pop();
-
-                      showDialog(
-                        context: context,
-                        builder: (_) => AlertDialog(
-                          content: Text('Berhasil Checkout, Silahkan menunggu admin menelpon nomor anda'),
-                        )
-                      )
-                      .then((_) => Navigator.of(context).pop());
-                    });
-                  },
-                )
-              )
-            );
+            // Navigator.of(context).push(
+            //   Routes.generatePage(
+            //     (_) => CheckoutPage(
+            //       onPostCheckout: (context, data) {
+            //         Helper.showLoading(context);
+            //
+            //         var user = Provider.of<AuthProvider>(context).value;
+            //
+            //         Future.wait(
+            //           []
+            //           ..addAll(pakets.map((pemesanan) {
+            //             pemesanan.tanggal = data['tanggal_pernikahan'];
+            //             pemesanan.alamat = data['alamat'];
+            //
+            //             return Network.instance.checkoutPaket(user!.token!, pemesanan);
+            //           }).toList())
+            //           ..addAll(produks.map((pemesanan) {
+            //             pemesanan.tanggal = data['tanggal_pernikahan'];
+            //             pemesanan.alamat = data['alamat'];
+            //
+            //             return Network.instance.checkoutProduk(user!.token!, pemesanan);
+            //           }))
+            //         )
+            //         .then((value) {
+            //           Navigator.of(context).pop();
+            //
+            //           showDialog(
+            //             context: context,
+            //             builder: (_) => AlertDialog(
+            //               content: Text('Berhasil Checkout, Silahkan menunggu admin menelpon nomor anda'),
+            //             )
+            //           )
+            //           .then((_) => Navigator.of(context).pop());
+            //         });
+            //       },
+            //     )
+            //   )
+            // );
           },
           child: Text('Checkout'),
         )
@@ -164,55 +164,55 @@ class _KeranjangBodyState extends State<KeranjangBody> {
   
   Widget _buildListProduk(BuildContext context, List<PemesananProduk> list) {
     return Column(
-      children: list.map((pemesanan) => KeranjangProdukComponent(
-        key: ObjectKey(pemesanan),
-        pemesanan: pemesanan,
-        onRestart: () => setState(() {}),
-        onRequestColor: () => produks.contains(pemesanan) ? Colors.green : Colors.grey,
-        onToggle: () {
-          if (produks.contains(pemesanan))
-            produks.remove(pemesanan);
-          else
-            produks.add(pemesanan);
-
-          setState(() {
-            total = 0;
-
-            if (produks.length > 0)
-              total += produks.map((pemesanan) => pemesanan.harga).reduce((a, b) => a + b);
-            
-            if (pakets.length > 0)
-              total += pakets.map((pemesanan) => pemesanan.harga).reduce((a, b) => a + b);
-          });
-        },
-      )).toList()
+      // children: list.map((pemesanan) => KeranjangProdukComponent(
+      //   key: ObjectKey(pemesanan),
+      //   pemesanan: pemesanan,
+      //   onRestart: () => setState(() {}),
+      //   onRequestColor: () => produks.contains(pemesanan) ? Colors.green : Colors.grey,
+      //   onToggle: () {
+      //     if (produks.contains(pemesanan))
+      //       produks.remove(pemesanan);
+      //     else
+      //       produks.add(pemesanan);
+      //
+      //     setState(() {
+      //       total = 0;
+      //
+      //       if (produks.length > 0)
+      //         total += produks.map((pemesanan) => pemesanan.harga).reduce((a, b) => a + b);
+      //
+      //       if (pakets.length > 0)
+      //         total += pakets.map((pemesanan) => pemesanan.harga).reduce((a, b) => a + b);
+      //     });
+      //   },
+      // )).toList()
     );
   }
 
   Widget _buildListPaket(BuildContext context, List<PemesananPaket> list) {
     return Column(
-      children: list.map((pemesanan) => KeranjangPaketComponent(
-        key: ValueKey(pemesanan.id),
-        pemesanan: pemesanan,
-        onRestart: () => setState(() {}),
-        onRequestColor: () => pakets.contains(pemesanan) ? Colors.green : Colors.grey,
-        onToggle: () {
-          if (pakets.contains(pemesanan))
-            pakets.remove(pemesanan);
-          else
-            pakets.add(pemesanan);
-
-          setState(() {
-            total = 0;
-
-            if (produks.length > 0)
-              total += produks.map((pemesanan) => pemesanan.harga).reduce((a, b) => a + b);
-            
-            if (pakets.length > 0)
-              total += pakets.map((pemesanan) => pemesanan.harga).reduce((a, b) => a + b);
-          });
-        },
-      )).toList()
+      // children: list.map((pemesanan) => KeranjangPaketComponent(
+      //   key: ValueKey(pemesanan.id),
+      //   pemesanan: pemesanan,
+      //   onRestart: () => setState(() {}),
+      //   onRequestColor: () => pakets.contains(pemesanan) ? Colors.green : Colors.grey,
+      //   onToggle: () {
+      //     if (pakets.contains(pemesanan))
+      //       pakets.remove(pemesanan);
+      //     else
+      //       pakets.add(pemesanan);
+      //
+      //     setState(() {
+      //       total = 0;
+      //
+      //       if (produks.length > 0)
+      //         total += produks.map((pemesanan) => pemesanan.harga).reduce((a, b) => a + b);
+      //
+      //       if (pakets.length > 0)
+      //         total += pakets.map((pemesanan) => pemesanan.harga).reduce((a, b) => a + b);
+      //     });
+      //   },
+      // )).toList()
     );
   }
 }

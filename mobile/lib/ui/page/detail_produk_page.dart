@@ -11,11 +11,12 @@ import 'package:yunikah/network.dart';
 import 'package:yunikah/provider/auth_provider.dart';
 import 'package:yunikah/ui/component/component.dart';
 import 'package:yunikah/ui/page.dart';
+import 'package:yunikah/ui/page/mitra/mitra_page.dart';
 
 class DetailProdukPage extends StatefulWidget {
   final Produk produk;
 
-  DetailProdukPage({this.produk});
+  DetailProdukPage({required this.produk});
 
   @override
   State<StatefulWidget> createState() => _DetailProdukPageState();
@@ -24,8 +25,8 @@ class DetailProdukPage extends StatefulWidget {
 class _DetailProdukPageState extends State<DetailProdukPage> with SingleTickerProviderStateMixin {
   final scaffoldState = GlobalKey<ScaffoldState>();
 
-  AnimationController _bottomAnimation;
-  DetailProduk _tersediaPilihan;
+  late AnimationController _bottomAnimation;
+  late DetailProduk _tersediaPilihan;
 
   @override
   void initState() {
@@ -85,13 +86,12 @@ class _DetailProdukPageState extends State<DetailProdukPage> with SingleTickerPr
                           children: <Widget>[
                             Text(
                               widget.produk.mitra.name.length > 10 ? widget.produk.mitra.name.substring(0, widget.produk.mitra.name.length % 20) : widget.produk.mitra.name,
-                              style: Theme.of(context).textTheme.title,
+                              style: Theme.of(context).textTheme.titleLarge,
                             ),
                             Row(
                               mainAxisAlignment: MainAxisAlignment.end,
                               children: <Widget>[
-                                FlatButton(
-                                  shape: OutlineInputBorder(),
+                                TextButton(
                                   child: Text('Kunjungi Mitra'),
                                   onPressed: () {
                                     Navigator.of(context).push(
@@ -113,11 +113,11 @@ class _DetailProdukPageState extends State<DetailProdukPage> with SingleTickerPr
                             children: <Widget>[
                               Text(
                                 'Rating',
-                                style: Theme.of(context).textTheme.subhead,
+                                style: Theme.of(context).textTheme.headlineMedium,
                               ),
                               Text(
                                 '5.0',
-                                style: Theme.of(context).textTheme.subhead,
+                                style: Theme.of(context).textTheme.headlineMedium,
                               )
                             ],
                           ),
@@ -134,7 +134,7 @@ class _DetailProdukPageState extends State<DetailProdukPage> with SingleTickerPr
                               Text('Transaksi'),
                               Text(
                                 widget.produk.transaksi?.toString() ?? "0",
-                                style: Theme.of(context).textTheme.subhead,
+                                style: Theme.of(context).textTheme.headlineMedium,
                               )
                             ],
                           ),
@@ -145,7 +145,7 @@ class _DetailProdukPageState extends State<DetailProdukPage> with SingleTickerPr
                               Text('Rating'),
                               Text(
                                 '5.0',
-                                style: Theme.of(context).textTheme.subhead,
+                                style: Theme.of(context).textTheme.headlineMedium,
                               )
                             ],
                           ),
@@ -163,25 +163,25 @@ class _DetailProdukPageState extends State<DetailProdukPage> with SingleTickerPr
                   children: <Widget>[
                     Text(
                       widget.produk.name,
-                      style: Theme.of(context).textTheme.title,
+                      style: Theme.of(context).textTheme.titleLarge,
                     ),
                     SizedBox(height: 50,),
                     Text(
                       widget.produk.keterangan ?? "",
-                      style: Theme.of(context).textTheme.body2,
+                      style: Theme.of(context).textTheme.bodyLarge,
                     ),
                     Divider(),
                     SizedBox(height: 20),
                     Text(
                       'Produk Lainnya',
-                      style: Theme.of(context).textTheme.title.apply(
+                      style: Theme.of(context).textTheme.titleLarge?.apply(
                         fontSizeDelta: 0.5
                       ),
                     ),
                     
                     FutureBuilder(
                       future: Network.instance.neighbordProduk(widget.produk, 1),
-                      builder: (context, AsyncSnapshot<ApiData<Produk>> snapshot) {
+                      builder: (context, AsyncSnapshot<ApiData<Produk>?> snapshot) {
                         if (snapshot.connectionState == ConnectionState.waiting) {
                           return GridView.count(
                             shrinkWrap: true,
@@ -189,7 +189,7 @@ class _DetailProdukPageState extends State<DetailProdukPage> with SingleTickerPr
                             children: List.generate(4, (index) => Padding(
                               padding: const EdgeInsets.all(8.0),
                               child: Shimmer.fromColors(
-                                baseColor: Colors.grey[400],
+                                baseColor: Colors.grey.shade400,
                                 highlightColor: Colors.white,
                                 child: Container(
                                   height: 200,
@@ -198,11 +198,11 @@ class _DetailProdukPageState extends State<DetailProdukPage> with SingleTickerPr
                               ),
                             )),
                           );
-                        } else if (snapshot.connectionState == ConnectionState.done && snapshot.hasData && snapshot.data.data.length > 0) {
+                        } else if (snapshot.connectionState == ConnectionState.done && snapshot.hasData && snapshot.data!.data.length > 0) {
                           return GridView.count(
                             shrinkWrap: true,
                             crossAxisCount: 2,
-                            children: snapshot.data.data.map((produk) => _buildProdukItem(produk)).toList(),
+                            children: snapshot.data!.data.map((produk) => _buildProdukItem(produk)).toList(),
                           );
                         }
 
@@ -332,7 +332,7 @@ class _DetailProdukPageState extends State<DetailProdukPage> with SingleTickerPr
               padding: const EdgeInsets.all(8.0),
               child: Text(
                 produk.name,
-                style: Theme.of(context).textTheme.subtitle,
+                style: Theme.of(context).textTheme.titleMedium,
               ),
             )
           ]

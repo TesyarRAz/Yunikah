@@ -7,7 +7,7 @@ class StatusPemesanan {
   String label;
   String keterangan;
 
-  StatusPemesanan({this.id, this.name, this.label, this.keterangan});
+  StatusPemesanan({required this.id, required this.name, required this.label, required this.keterangan});
 
   factory StatusPemesanan.parseFromJson(Map<String, dynamic> map) => StatusPemesanan(
     id: map['id'],
@@ -26,9 +26,9 @@ class PemesananProduk {
 
   Produk produk;
   StatusPemesanan status;
-  DetailProduk pilihan;
+  DetailProduk? pilihan;
   
-  PemesananProduk({this.id, this.alamat, this.tanggal, this.harga, this.kuantitas, this.produk, this.status, this.pilihan});
+  PemesananProduk({required this.id, required this.alamat, required this.tanggal, required this.harga, required this.kuantitas, required this.produk, required this.status, this.pilihan});
   factory PemesananProduk.parseFromJson(Map<String, dynamic> map) => PemesananProduk(
     id: map['id'],
     alamat: map['alamat'],
@@ -53,7 +53,7 @@ class PemesananPaket {
   Paket paket;
 
   PemesananPaket({
-    this.id, this.alamat, this.tanggal, this.harga, this.status, this.paket
+    required this.id, required this.alamat, required this.tanggal, required this.harga, required this.status, required this.paket
   });
 
   factory PemesananPaket.parseFromJson(Map<String, dynamic> map) => PemesananPaket(

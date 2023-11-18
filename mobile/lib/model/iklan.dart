@@ -6,7 +6,7 @@ class Iklan {
   
   Asset image;
 
-  Iklan({this.id, this.name, this.image});
+  Iklan({required this.id, required this.name, required this.image});
 
   factory Iklan.parseFromJson(Map<String, dynamic> data) => Iklan(
     id: data['id'],

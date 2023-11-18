@@ -26,13 +26,13 @@ class YunikahApp extends StatelessWidget {
           initialData: AuthProvider(null),
           value: SharedPreferences.getInstance().then((prefs) async {
             if (prefs.containsKey("token")) {
-              return await Network.instance.userData(prefs.getString("token"))
+              return await Network.instance.userData(prefs.getString("token")!)
               .then((user) {
                 if (user == null) {
                   prefs.clear();
                 }
 
-                user.token = prefs.getString("token");
+                user?.token = prefs.getString("token")!;
 
                 return AuthProvider(user);
               });

@@ -12,14 +12,14 @@ class ProdukCustomComponent extends StatefulWidget {
   final Function(bool) onSuccess;
   final Function(Exception) onError;
 
-  ProdukCustomComponent({Key key, this.produk, this.onLoading, this.onSuccess, this.onError}) : super(key: key);
+  ProdukCustomComponent({Key? key, required this.produk, required this.onLoading, required this.onSuccess, required this.onError}) : super(key: key);
   
   @override
   State<StatefulWidget> createState() => _ProdukCustomComponentState();
 }
 
 class _ProdukCustomComponentState extends State<ProdukCustomComponent> {
-  TextEditingController _textKuantitas;
+  late TextEditingController _textKuantitas;
   int _kuantitas = 0;
   
   @override
@@ -95,7 +95,7 @@ class _ProdukCustomComponentState extends State<ProdukCustomComponent> {
 
             widget.onLoading();
 
-            Network.instance.pesanProdukCustom(Provider.of<AuthProvider>(context).value.token, widget.produk, _kuantitas)
+            Network.instance.pesanProdukCustom(Provider.of<AuthProvider>(context).value!.token!, widget.produk, _kuantitas)
             .catchError((exception) {
               Navigator.of(context).pop();
 
@@ -105,7 +105,7 @@ class _ProdukCustomComponentState extends State<ProdukCustomComponent> {
             .then((success) {
               Navigator.of(context).pop();
 
-              (widget.onSuccess(success) as Future)
+              (widget.onSuccess(success ?? false) as Future)
               .then((_) => Navigator.of(context).pop());
             });
           },

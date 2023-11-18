@@ -12,14 +12,14 @@ class ProdukTersediaComponent extends StatefulWidget {
   final Function(bool) onSuccess;
   final Function(Exception) onError;
 
-  ProdukTersediaComponent({Key key, this.produk, this.onLoading, this.onSuccess, this.onError}) : super(key: key);
+  ProdukTersediaComponent({Key? key, required this.produk, required this.onLoading, required this.onSuccess, required this.onError}) : super(key: key);
 
   @override
   State<StatefulWidget> createState() => _ProdukTersediaComponentState();
 }
 
 class _ProdukTersediaComponentState extends State<ProdukTersediaComponent> {
-  DetailProduk _pilihan;
+  late DetailProduk _pilihan;
 
   @override
   Widget build(BuildContext context) {
@@ -27,7 +27,7 @@ class _ProdukTersediaComponentState extends State<ProdukTersediaComponent> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
         Column(
-          children: widget.produk.data.map((data) => _buildTersediaItem(data)).toList(),
+          children: widget.produk.data?.map((data) => _buildTersediaItem(data)).toList() ?? [],
         ),
         MaterialButton(
           color: Theme.of(context).primaryColor,
@@ -37,7 +37,7 @@ class _ProdukTersediaComponentState extends State<ProdukTersediaComponent> {
 
             widget.onLoading();
 
-            Network.instance.pesanProdukTersedia(Provider.of<AuthProvider>(context).value.token, widget.produk, _pilihan)
+            Network.instance.pesanProdukTersedia(Provider.of<AuthProvider>(context).value!.token!, widget.produk, _pilihan)
             .catchError((exception) {
               Navigator.of(context).pop();
 
@@ -47,7 +47,7 @@ class _ProdukTersediaComponentState extends State<ProdukTersediaComponent> {
             .then((success) {
               Navigator.of(context).pop();
 
-              (widget.onSuccess(success) as Future)
+              (widget.onSuccess(success ?? false) as Future)
               .then((_) => Navigator.of(context).pop());
             });
           },
