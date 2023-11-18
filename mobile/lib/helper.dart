@@ -6,9 +6,14 @@ class Helper {
     return showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (_) => Dialog(
-        child: CircularProgressIndicator(),
-      )
+      builder: (_) => AlertDialog(
+        content: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            CircularProgressIndicator(),
+          ],
+        ),
+      ),
     );
   }
 }

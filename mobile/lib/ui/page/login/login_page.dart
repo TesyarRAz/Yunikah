@@ -86,7 +86,7 @@ class _LoginPageState extends State<LoginPage> {
                       SharedPreferences.getInstance().then((prefs) {
                         prefs.setString("token", user.token!);
                         
-                        Provider.of<AuthProvider>(context).value = user;
+                        Provider.of<AuthProvider>(context, listen: false).value = user;
                       });
 
                       Navigator.of(context).pop();

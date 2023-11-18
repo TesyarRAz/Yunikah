@@ -3,16 +3,14 @@ import 'package:yunikah/model/produk.dart';
 
 class DataPaket {
   int id;
-  String name;
 
-  Produk produk;
+  Produk? produk;
 
-  DataPaket({required this.id, required this.name, required this.produk});
+  DataPaket({required this.id, this.produk});
 
   factory DataPaket.parseFromJson(Map<String, dynamic> map) => DataPaket(
     id: map['id'],
-    name: map['name'],
-    produk: Produk.parseFromJson(map['produk'])
+    produk: map['produk'] != null ? Produk.parseFromJson(map['produk']) : null,
   );
 }
 
@@ -22,7 +20,7 @@ class Paket {
   int id;
   String name;
   int harga;
-  String keterangan;
+  String? keterangan;
 
   Asset image;
   List<DataPaket>? data;

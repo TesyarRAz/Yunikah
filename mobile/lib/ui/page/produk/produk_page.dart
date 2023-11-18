@@ -55,7 +55,7 @@ class _ProdukPageState extends State<ProdukPage> {
               return _buildBody(snapshot.data!);
 
             return Center(
-              child: Text('Tidak Ada Koneksi Internet'),
+              child: Text('Tidak ada data'),
             );
           },
         )

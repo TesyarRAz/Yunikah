@@ -20,7 +20,7 @@ class SearchPage extends StatefulWidget {
 class _SearchPageState extends State<SearchPage> {
   late TextEditingController _searchText;
 
-  late List<Widget> _searchData;
+  List<Widget>? _searchData;
   bool _searchLoading = false;
 
   @override
@@ -53,7 +53,7 @@ class _SearchPageState extends State<SearchPage> {
             ),
             _searchData != null ? SingleChildScrollView(
               child: Column(
-                children: _searchData,
+                children: _searchData!,
               ),
             ) : _searchLoading ? Center(child: CircularProgressIndicator(),) : Container()
           ],

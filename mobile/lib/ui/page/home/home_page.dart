@@ -23,7 +23,7 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  late Map<String, dynamic> _cacheData;
+  Map<String, dynamic>? _cacheData;
 
   late ScrollController _mainScroll, _produkScroll, _paketScroll, _mitraScroll;
 
@@ -96,7 +96,7 @@ class _HomePageState extends State<HomePage> {
             IklanComponent(data['iklan']),
             _buildHeader(),
             _buildKategori(),
-            _buildPaket(data['paket']),
+            // _buildPaket(data['paket']),
             _buildMitra(data['mitra'])
           ],
         ),
@@ -380,22 +380,34 @@ class _HomePageState extends State<HomePage> {
         Network.instance.allMitra(1)
       ])
       .then((value) {
+        var iklans = value[0];
+        var pakets = value[1];
+        var mitras = value[2];
+
+        if (iklans != null) {
+          Provider.of<IklanProvider>(context, listen: false).value = value[0] as ApiData<Iklan>?;
+        }
+        if (pakets != null) {
+          Provider.of<PaketProvider>(context, listen: false).value = value[1] as ApiData<Paket>?;
+        }
+        if (mitras != null) {
+          Provider.of<MitraProvider>(context, listen: false).value = value[2] as ApiData<Mitra>?;
+        }
+
         _cacheData = {
           'iklan': value[0],
           'paket': value[1],
           'mitra': value[2]
         };
-
-        Provider.of<IklanProvider>(context, listen: false).value = value[0] as ApiData<Iklan>?;
-        Provider.of<PaketProvider>(context, listen: false).value = value[1] as ApiData<Paket>?;
-        Provider.of<MitraProvider>(context, listen: false).value = value[2] as ApiData<Mitra>?;
         
-        PageStorage.of(context).writeState(context, _cacheData, identifier: 'home_data');
+        if (value[0] != null && value[1] != null && value[2] != null) {
+          PageStorage.of(context).writeState(context, _cacheData, identifier: 'home_data');
+        }
 
-        return _cacheData;
+        return _cacheData!;
       });
     }
 
-    return _cacheData;
+    return _cacheData!;
   }
 }

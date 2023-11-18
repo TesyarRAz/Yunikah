@@ -19,7 +19,7 @@ class ProdukTersediaComponent extends StatefulWidget {
 }
 
 class _ProdukTersediaComponentState extends State<ProdukTersediaComponent> {
-  late DetailProduk _pilihan;
+  DetailProduk? _pilihan;
 
   @override
   Widget build(BuildContext context) {
@@ -37,7 +37,7 @@ class _ProdukTersediaComponentState extends State<ProdukTersediaComponent> {
 
             widget.onLoading();
 
-            Network.instance.pesanProdukTersedia(Provider.of<AuthProvider>(context).value!.token!, widget.produk, _pilihan)
+            Network.instance.pesanProdukTersedia(Provider.of<AuthProvider>(context).value!.token!, widget.produk, _pilihan!)
             .catchError((exception) {
               Navigator.of(context).pop();
 

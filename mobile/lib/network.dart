@@ -116,8 +116,7 @@ class Network {
   }
 
   Future<bool?> pesanProdukTersedia(String token, Produk produk, DetailProduk detail) async {
-    try {
-      return await _client.post(
+    return await _client.post(
         Uri.parse(API_URL + "pemesanan/produk/${produk.id}"),
         headers: {
           HttpHeaders.authorizationHeader : 'Bearer $token'
@@ -125,20 +124,16 @@ class Network {
         body: {
           "pilihan_produk_id" : detail.id.toString()
         }
-      )
-      .then((response) {
-        print(response.body);
+    )
+        .then((response) {
+      print(response.body);
 
-        return response.statusCode == 200;
-      });
-    } catch (ex) {
-      return null;
-    }
+      return response.statusCode == 200;
+    });
   }
 
   Future<bool?> pesanProdukCustom(String token, Produk produk, int jumlah) async {
-    try {
-      return await _client.post(
+    return await _client.post(
         Uri.parse(API_URL + "pemesanan/produk/${produk.id}"),
         headers: {
           HttpHeaders.authorizationHeader : 'Bearer $token'
@@ -146,96 +141,67 @@ class Network {
         body: {
           "kuantitas" : jumlah.toString()
         }
-      )
-      .then((response) {
-        print(response.body);
-        return response.statusCode == 200;
-      });
-    } catch (ex) {
-      return false;
-    }
+    )
+        .then((response) {
+      print(response.body);
+      return response.statusCode == 200;
+    });
   }
 
   Future<bool?> pesanPaket(String token, Paket paket) async {
-    try {
-      return await _client.post(
+    return await _client.post(
         Uri.parse(API_URL + "pemesanan/paket/${paket.id}"),
         headers: {
           HttpHeaders.authorizationHeader : 'Bearer $token'
         }
-      )
-      .then((response) => response.statusCode == 200);
-    } catch (ex) {
-      return null;
-    }
+    )
+        .then((response) => response.statusCode == 200);
   }
 
   Future<ApiData<Produk>?> mitraProduk(Mitra mitra, int page) async {
-    try {
-      return ApiData.parseFromJson(
+    return ApiData.parseFromJson(
         await _client.get(Uri.parse(API_URL + "mitra/${mitra.id}/produk"))
-        .then((response) => jsonDecode(response.body)),
+            .then((response) => jsonDecode(response.body)),
         parseProdukFromJson
-      );
-    } catch (ex) {
-      return null;
-    }
+    );
   }
 
   Future<ApiData<Produk>?> neighbordProduk(Produk produk, int page) async {
-    try {
-      var data =  ApiData.parseFromJson(
+    var data =  ApiData.parseFromJson(
         await _client.get(Uri.parse(API_URL + "mitra/${produk.mitra.id}/produk"))
-        .then((response) => jsonDecode(response.body)),
+            .then((response) => jsonDecode(response.body)),
         parseProdukFromJson
-      );
+    );
 
-      data.data.removeWhere((neighboard) => produk.id == neighboard.id);
+    data.data.removeWhere((neighboard) => produk.id == neighboard.id);
 
-      return data;
-    } catch (ex) {
-      return null;
-    }
+    return data;
   }
 
   Future<ApiData<Paket>?> allPaket(int page) async {
-    try {
-      return await _client.get(Uri.parse(API_URL + "paket/?page=$page"))
-      .then((response) => jsonDecode(response.body))
-      .then((json) => ApiData.parseFromJson(json, parsePaketFromJson));
-    } catch (ex) {
-      return null;
-    }
+    return await _client.get(Uri.parse(API_URL + "paket/?page=$page"))
+        .then((response) => jsonDecode(response.body))
+        .then((json) => ApiData.parseFromJson(json, parsePaketFromJson));
   }
   
   Future<ApiData<Mitra>?> allMitra(int page) async {
-    try {
-      return await _client.get(Uri.parse(API_URL + "mitra/?page=$page"))
-      .then((response) => jsonDecode(response.body))
-      .then((json) => ApiData.parseFromJson(json, parseMitraFromJson));
-    } catch (ex) {
-      return null;
-    }
+    return await _client.get(Uri.parse(API_URL + "mitra/?page=$page"))
+        .then((response) => jsonDecode(response.body))
+        .then((json) => ApiData.parseFromJson(json, parseMitraFromJson));
   }
 
   Future<ApiData<Iklan>?> allIklan(int page) async {
-    try {
-      return await _client.get(Uri.parse(API_URL + "iklan/?page=$page"))
-      .then((response) => jsonDecode(response.body))
-      .then((json) => ApiData.parseFromJson(json, parseIklanFromJson));
-    } catch (ex) {
-      return null;
-    }
+    return await _client.get(Uri.parse(API_URL + "iklan/?page=$page"))
+        .then((response) => jsonDecode(response.body))
+        .then((json) => ApiData.parseFromJson(json, parseIklanFromJson));
   }
 
   Future<ApiData<Produk>?> allProduk(String kategori, int page) async {
-    try {
-      return await _client.get(Uri.parse(API_URL + "produk/$kategori/?page=$page"))
-      .then((response) => jsonDecode(response.body))
-      .then((json) => ApiData.parseFromJson(json, parseProdukFromJson));
-    } catch (ex) {
-      return null;
-    }
+    var data = await _client.get(Uri.parse(API_URL + "produk/$kategori/?page=$page"))
+        .then((response) => jsonDecode(response.body))
+        .then((json) => ApiData.parseFromJson(json, parseProdukFromJson));
+
+    return data;
   }
 
   Future<Map<String, dynamic>?> register(User user) async {
